@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#c8607a" />
+
+  <!-- SEO -->
+  <title>Lumière — Beauté Premium | French & Arabic</title>
+  <meta name="description" content="Votre destination beauté premium. Soins naturels, maquillage de luxe et parfums d'exception. متجر الجمال الفاخر." />
+  <meta name="keywords"    content="beauté, cosmétiques, soin de la peau, maquillage, parfums, جمال, عناية بالبشرة" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Lumière Beauty Store" />
+  <meta property="og:description" content="Votre destination beauté premium." />
+  <meta property="og:type"        content="website" />
+
+  <!-- Preconnect for Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="src/styles/variables.css" />
+  <link rel="stylesheet" href="src/styles/global.css" />
+  <link rel="stylesheet" href="src/styles/header.css" />
+  <link rel="stylesheet" href="src/styles/hero.css" />
+</head>
+
+<body>
+  <!-- Header injected by JS -->
+  <div id="header-root"></div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- HERO SECTION                                               -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <main id="main-content">
+    <section class="hero" id="hero" aria-labelledby="hero-heading">
+
+      <!-- Decorative blobs -->
+      <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+      <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
+      <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
+
+      <div class="container">
+        <div class="hero__inner">
+
+          <!-- Text column -->
+          <div class="hero__content">
+            <span class="hero__badge" data-i18n="hero.badge">Nouvelle collection 2026</span>
+
+            <h1 class="hero__heading" id="hero-heading" data-i18n-html="hero.heading">
+              La beauté,<br>en toute simplicité.
+            </h1>
+
+            <p class="hero__subheading" data-i18n="hero.subheading">
+              Découvrez nos soins naturels, maquillage de luxe et parfums d'exception.
+            </p>
+
+            <div class="hero__ctas">
+              <a href="#shop" class="btn btn--primary" id="cta-primary" data-i18n="hero.ctaPrimary">
+                Découvrir la collection
+              </a>
+              <a href="#bestsellers" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
+                Nos bestsellers
+              </a>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="hero__trust">
+              <div class="hero__trust-item">
+                <span>🌿</span>
+                <span class="hero__trust-label">100% Naturel</span>
+              </div>
+              <div class="hero__trust-item">
+                <span>🚚</span>
+                <span class="hero__trust-label" data-i18n="cart.freeShipping">Livraison offerte</span>
+              </div>
+              <div class="hero__trust-item">
+                <span>💎</span>
+                <span class="hero__trust-label">Premium</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual column -->
+          <div class="hero__visual" aria-hidden="true">
+            <div class="hero__card hero__card--main">
+              <div class="hero__card-glow"></div>
+              <div class="hero__product-mockup">
+                <div class="hero__product-img">🧴</div>
+                <div class="hero__product-info">
+                  <p class="hero__product-name">Sérum Éclat Rose</p>
+                  <p class="hero__product-price">89,00 €</p>
+                </div>
+                <div class="hero__product-badge" data-i18n="product.new">Nouveau</div>
+              </div>
+            </div>
+            <div class="hero__card hero__card--floating hero__card--a">
+              <span>⭐</span> 4.9 — 2 400 avis
+            </div>
+            <div class="hero__card hero__card--floating hero__card--b">
+              <span>💄</span>
+              <span data-i18n="product.bestseller">Bestseller</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="hero__scroll-hint">
+        <span data-i18n="hero.scrollHint">Défiler pour explorer</span>
+        <div class="hero__scroll-arrow"></div>
+      </div>
+    </section>
+
+    <!-- ══ Placeholder sections (expand later) ══ -->
+    <section id="shop"       style="min-height:60vh; display:flex; align-items:center; justify-content:center;">
+      <h2 style="color:var(--color-text-muted); font-size:var(--fs-lg);" data-i18n="categories.title">
+        Explorez nos univers
+      </h2>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- FOOTER (minimal)                                           -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        <span class="site-footer__brand">Lumière</span>
+        — <span data-i18n="footer.tagline">Votre destination beauté premium.</span>
+      </p>
+      <p class="site-footer__copy">
+        © 2026 Lumière. <span data-i18n="footer.rights">Tous droits réservés.</span>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- APP ENTRY POINT                                            -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

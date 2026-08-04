@@ -1,0 +1,94 @@
+/* ============================================================
+   DESIGN TOKENS — Beauty Store
+   ============================================================ */
+
+:root {
+  /* --- Brand palette --- */
+  --color-primary:        #c8607a;   /* Rose poudré */
+  --color-primary-light:  #e8a0b0;
+  --color-primary-dark:   #9e3d55;
+  --color-secondary:      #7c5cbf;   /* Mauve profond */
+  --color-secondary-light:#b09de0;
+  --color-accent:         #f5c842;   /* Or chaud */
+
+  /* --- Neutrals --- */
+  --color-bg:             #fdf6f8;
+  --color-surface:        #ffffff;
+  --color-surface-2:      #f9f1f4;
+  --color-border:         #ead5dc;
+  --color-text:           #2a1a20;
+  --color-text-muted:     #8a6070;
+  --color-text-on-primary:#ffffff;
+
+  /* --- Semantic --- */
+  --color-success:        #4caf84;
+  --color-warning:        #f5a742;
+  --color-error:          #e84d6a;
+
+  /* --- Typography --- */
+  --font-sans:   'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-arabic: 'Noto Sans Arabic', 'Amiri', 'Segoe UI', sans-serif;
+  --font-mono:   'Fira Code', 'Courier New', monospace;
+
+  --fs-xs:   0.70rem;
+  --fs-sm:   0.825rem;
+  --fs-base: 1rem;
+  --fs-md:   1.125rem;
+  --fs-lg:   1.375rem;
+  --fs-xl:   1.75rem;
+  --fs-2xl:  2.25rem;
+  --fs-3xl:  3rem;
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+  --fw-bold:    700;
+
+  --lh-tight:  1.2;
+  --lh-snug:   1.4;
+  --lh-normal: 1.6;
+  --lh-relaxed:1.8;
+
+  /* --- Spacing scale --- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10:2.5rem;
+  --sp-12:3rem;
+  --sp-16:4rem;
+  --sp-20:5rem;
+
+  /* --- Radius --- */
+  --radius-sm:  4px;
+  --radius-md:  10px;
+  --radius-lg:  18px;
+  --radius-xl:  28px;
+  --radius-full:9999px;
+
+  /* --- Shadows --- */
+  --shadow-sm:  0 1px 4px rgba(200, 96, 122, 0.08);
+  --shadow-md:  0 4px 20px rgba(200, 96, 122, 0.12);
+  --shadow-lg:  0 10px 40px rgba(200, 96, 122, 0.18);
+  --shadow-glow:0 0 24px rgba(200, 96, 122, 0.30);
+
+  /* --- Transitions --- */
+  --transition-fast:   150ms ease;
+  --transition-normal: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- Layout --- */
+  --header-height: 72px;
+  --container-max: 1280px;
+  --sidebar-width: 280px;
+
+  /* --- Z-index scale --- */
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-overlay:   300;
+  --z-modal:     400;
+  --z-toast:     500;
+}

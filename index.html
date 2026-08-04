@@ -6,34 +6,40 @@
   <meta name="theme-color" content="#c8607a" />
 
   <!-- SEO -->
-  <title>Lumière — Beauté Premium | French & Arabic</title>
-  <meta name="description" content="Votre destination beauté premium. Soins naturels, maquillage de luxe et parfums d'exception. متجر الجمال الفاخر." />
-  <meta name="keywords"    content="beauté, cosmétiques, soin de la peau, maquillage, parfums, جمال, عناية بالبشرة" />
+  <title>Lumière — Beauté & Cosmétiques Premium | متجر الجمال</title>
+  <meta name="description" content="Votre destination beauté premium au Maroc. Soins naturels, maquillage de luxe et parfums d'exception en Dirhams marocains. متجر الجمال الفاخر بالدرهم المغربي." />
+  <meta name="keywords" content="beauté, cosmétiques, soin de la peau, maquillage, parfums, argan, MAD, جمال, عناية بالبشرة, درهم" />
 
   <!-- Open Graph -->
-  <meta property="og:title"       content="Lumière Beauty Store" />
-  <meta property="og:description" content="Votre destination beauté premium." />
+  <meta property="og:title"       content="Lumière — Beauté Premium" />
+  <meta property="og:description" content="Votre destination beauté premium. Tous les prix en Dirhams marocains (MAD)." />
   <meta property="og:type"        content="website" />
 
-  <!-- Preconnect for Google Fonts -->
+  <!-- Preconnect for fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Stylesheets -->
+  <!-- Stylesheets (order matters) -->
   <link rel="stylesheet" href="src/styles/variables.css" />
   <link rel="stylesheet" href="src/styles/global.css" />
+  <link rel="stylesheet" href="src/styles/components.css" />
   <link rel="stylesheet" href="src/styles/header.css" />
   <link rel="stylesheet" href="src/styles/hero.css" />
+  <link rel="stylesheet" href="src/styles/shop.css" />
+  <link rel="stylesheet" href="src/styles/cart.css" />
 </head>
 
 <body>
-  <!-- Header injected by JS -->
+  <!-- ╔══════════════════════════════════════════════╗ -->
+  <!-- ║  HEADER (injected by JS)                     ║ -->
+  <!-- ╚══════════════════════════════════════════════╝ -->
   <div id="header-root"></div>
 
-  <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- HERO SECTION                                               -->
-  <!-- ══════════════════════════════════════════════════════════ -->
   <main id="main-content">
+
+    <!-- ╔══════════════════════════════════════════════╗ -->
+    <!-- ║  HERO                                        ║ -->
+    <!-- ╚══════════════════════════════════════════════╝ -->
     <section class="hero" id="hero" aria-labelledby="hero-heading">
 
       <!-- Decorative blobs -->
@@ -60,7 +66,7 @@
               <a href="#shop" class="btn btn--primary" id="cta-primary" data-i18n="hero.ctaPrimary">
                 Découvrir la collection
               </a>
-              <a href="#bestsellers" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
+              <a href="#shop" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
                 Nos bestsellers
               </a>
             </div>
@@ -90,7 +96,7 @@
                 <div class="hero__product-img">🧴</div>
                 <div class="hero__product-info">
                   <p class="hero__product-name">Sérum Éclat Rose</p>
-                  <p class="hero__product-price">89,00 €</p>
+                  <p class="hero__product-price">199,00 DH</p>
                 </div>
                 <div class="hero__product-badge" data-i18n="product.new">Nouveau</div>
               </div>
@@ -114,17 +120,16 @@
       </div>
     </section>
 
-    <!-- ══ Placeholder sections (expand later) ══ -->
-    <section id="shop"       style="min-height:60vh; display:flex; align-items:center; justify-content:center;">
-      <h2 style="color:var(--color-text-muted); font-size:var(--fs-lg);" data-i18n="categories.title">
-        Explorez nos univers
-      </h2>
-    </section>
+    <!-- ╔══════════════════════════════════════════════╗ -->
+    <!-- ║  SHOP SECTION (injected by ShopSection.js)  ║ -->
+    <!-- ╚══════════════════════════════════════════════╝ -->
+    <div id="shop-root"></div>
+
   </main>
 
-  <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- FOOTER (minimal)                                           -->
-  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- ╔══════════════════════════════════════════════╗ -->
+  <!-- ║  FOOTER                                      ║ -->
+  <!-- ╚══════════════════════════════════════════════╝ -->
   <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>
@@ -133,13 +138,12 @@
       </p>
       <p class="site-footer__copy">
         © 2026 Lumière. <span data-i18n="footer.rights">Tous droits réservés.</span>
+        · <span style="color:var(--color-primary);">🇲🇦 Tous les prix en DH (MAD)</span>
       </p>
     </div>
   </footer>
 
-  <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- APP ENTRY POINT                                            -->
-  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- App entry point -->
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

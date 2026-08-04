@@ -2,42 +2,81 @@
  * main.js — Application Entry Point
  * Beauty Store
  *
- * Bootstraps i18n, renders the header, and wires up global UI behaviour.
+ * Bootstraps: i18n → Header → CartDrawer → ShopSection
  */
 
-import i18n  from './context/i18n.js';
-import Header from './components/layout/Header.js';
+import i18n        from './context/i18n.js';
+import cartStore   from './context/cartStore.js';
+import Header      from './components/layout/Header.js';
+import CartDrawer  from './components/cart/CartDrawer.js';
+import ShopSection from './components/product/ShopSection.js';
 
-// ── 1. Initialise i18n (reads localStorage → defaults to 'fr') ─────────────
+// ── 1. i18n init ──────────────────────────────────────────────────────────────
 i18n.init();
 
-// ── 2. Mount the header ────────────────────────────────────────────────────
+// ── 2. Cart drawer ────────────────────────────────────────────────────────────
+const cartDrawer = new CartDrawer();
+cartDrawer.mount(document.body);
+
+// ── 3. Header ─────────────────────────────────────────────────────────────────
 const headerRoot = document.getElementById('header-root');
 if (headerRoot) {
-  const header = new Header({ cartCount: 3, wishlistCount: 1 });
-  headerRoot.replaceWith(header.render());
+  const { count, items } = cartStore.summary();
+  const header = new Header({ cartCount: count });
+  const headerEl = header.render();
+  headerRoot.replaceWith(headerEl);
+
+  // Wire the cart icon in the header to open the drawer
+  document.addEventListener('click', e => {
+    if (e.target.closest('#btn-cart')) {
+      e.preventDefault();
+      cartDrawer.toggle();
+    }
+  });
 }
 
-// ── 3. React to language changes globally ──────────────────────────────────
-document.addEventListener('langchange', ({ detail }) => {
-  console.info(`[App] Language changed → ${detail.lang} (${detail.dir})`);
+// ── 4. Shop section ───────────────────────────────────────────────────────────
+const shopRoot = document.getElementById('shop-root');
+if (shopRoot) {
+  const shop = new ShopSection({ cartDrawer });
+  shop.mount(shopRoot);
+}
 
-  // Update <title> for screen readers
+// ── 5. Update header cart badge on cart change ────────────────────────────────
+document.addEventListener('cartchange', ({ detail }) => {
+  const badge = document.querySelector('#btn-cart .header__badge');
+  if (badge) {
+    badge.textContent = detail.count;
+    badge.style.display = detail.count > 0 ? 'flex' : 'none';
+  } else if (detail.count > 0) {
+    // Badge doesn't exist yet — re-render header
+    const btn = document.getElementById('btn-cart');
+    if (btn && !btn.querySelector('.header__badge')) {
+      const b = document.createElement('span');
+      b.className = 'header__badge';
+      b.setAttribute('aria-label', `${detail.count} articles`);
+      b.textContent = detail.count;
+      btn.appendChild(b);
+    }
+  }
+});
+
+// ── 6. Global lang change ─────────────────────────────────────────────────────
+document.addEventListener('langchange', ({ detail }) => {
+  // Update page <title>
   document.title = detail.lang === 'ar'
     ? 'لوميير — الجمال الفاخر'
     : 'Lumière — Beauté Premium';
 
-  // Animate the page on direction flip (cross-fade effect)
+  // Cross-fade animation
   document.body.style.opacity = '0';
   document.body.style.transition = 'opacity 200ms ease';
   requestAnimationFrame(() => {
-    setTimeout(() => {
-      document.body.style.opacity = '1';
-    }, 50);
+    setTimeout(() => { document.body.style.opacity = '1'; }, 60);
   });
 });
 
-// ── 4. Scroll-to-top on logo click ────────────────────────────────────────
+// ── 7. Logo → scroll to top ───────────────────────────────────────────────────
 document.addEventListener('click', e => {
   if (e.target.closest('.header__logo')) {
     e.preventDefault();
@@ -45,20 +84,24 @@ document.addEventListener('click', e => {
   }
 });
 
-// ── 5. Highlight active nav link on scroll ─────────────────────────────────
-const sections = document.querySelectorAll('section[id]');
-const navLinks  = document.querySelectorAll('.header__nav-link');
+// ── 8. Keyboard: close cart on Escape ────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') cartDrawer.close();
+});
 
-if (sections.length && navLinks.length) {
+// ── 9. Active nav on scroll ───────────────────────────────────────────────────
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = () => document.querySelectorAll('.header__nav-link');
+
+if (sections.length) {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        navLinks.forEach(link => {
+        navLinks().forEach(link => {
           link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`);
         });
       }
     });
   }, { rootMargin: '-30% 0px -60% 0px' });
-
   sections.forEach(s => observer.observe(s));
 }

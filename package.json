@@ -1,0 +1,22 @@
+{
+  "name": "beauty-store",
+  "version": "1.0.0",
+  "description": "A modern beauty products e-commerce store",
+  "main": "src/index.html",
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "lint": "npx eslint src/**/*.js",
+    "format": "npx prettier --write src/**/*.{js,css,html}",
+    "test": "echo \"No tests configured yet\" && exit 0"
+  },
+  "keywords": [
+    "beauty",
+    "ecommerce",
+    "cosmetics",
+    "skincare",
+    "shop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {}
+}

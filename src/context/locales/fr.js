@@ -59,16 +59,58 @@ const fr = {
     tools:     "Accessoires",
   },
 
+  /* ---- Currency ---- */
+  currency: {
+    code:          "MAD",
+    symbol:        "DH",
+    name:          "Dirham marocain",
+    priceLabel:    "Prix",
+    regularPrice:  "Prix normal",
+    salePrice:     "Prix soldé",
+    youSave:       "Vous économisez {{amount}} DH",
+    priceFrom:     "À partir de {{price}} DH",
+    free:          "Gratuit",
+  },
+
   /* ---- Product card ---- */
   product: {
-    addToCart:    "Ajouter au panier",
-    addToWishlist:"Ajouter aux favoris",
-    outOfStock:   "Rupture de stock",
-    new:          "Nouveau",
-    sale:         "Promo",
-    bestseller:   "Bestseller",
-    rating:       "avis",
-    from:         "À partir de",
+    addToCart:      "Ajouter au panier",
+    addToWishlist:  "Ajouter aux favoris",
+    outOfStock:     "Rupture de stock",
+    lowStock:       "Stock limité",
+    inStock:        "En stock",
+    preOrder:       "Pré-commande",
+    new:            "Nouveau",
+    sale:           "Promo",
+    bestseller:     "Bestseller",
+    limited:        "Édition limitée",
+    exclusive:      "Exclusivité",
+    vegan:          "Vegan",
+    natural:        "Naturel",
+    rating:         "avis",
+    from:           "À partir de",
+    ingredients:    "Ingrédients actifs",
+    variants:       "Choisissez votre option",
+    reviewCount:    "{{count}} avis",
+    shareProduct:   "Partager ce produit",
+  },
+
+  /* ---- Stock status ---- */
+  stock: {
+    inStock:     "En stock",
+    lowStock:    "Stock limité ({{qty}} restants)",
+    outOfStock:  "Rupture de stock",
+    preOrder:    "Pré-commande",
+  },
+
+  /* ---- Categories ---- */
+  categoryLabels: {
+    skincare:  "Soin de la peau",
+    makeup:    "Maquillage",
+    perfumes:  "Parfums",
+    haircare:  "Soins capillaires",
+    body:      "Soin du corps",
+    tools:     "Accessoires & Outils",
   },
 
   /* ---- Cart ---- */

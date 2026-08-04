@@ -59,16 +59,58 @@ const ar = {
     tools:     "الإكسسوارات",
   },
 
+  /* ---- Currency ---- */
+  currency: {
+    code:          "MAD",
+    symbol:        "د.م",
+    name:          "الدرهم المغربي",
+    priceLabel:    "السعر",
+    regularPrice:  "السعر الأصلي",
+    salePrice:     "سعر التخفيض",
+    youSave:       "توفّرين {{amount}} د.م",
+    priceFrom:     "ابتداءً من {{price}} د.م",
+    free:          "مجاني",
+  },
+
   /* ---- Product card ---- */
   product: {
-    addToCart:    "أضيفي إلى السلة",
-    addToWishlist:"أضيفي إلى المفضلة",
-    outOfStock:   "نفد من المخزون",
-    new:          "جديد",
-    sale:         "خصم",
-    bestseller:   "الأكثر مبيعاً",
-    rating:       "تقييم",
-    from:         "ابتداءً من",
+    addToCart:      "أضيفي إلى السلة",
+    addToWishlist:  "أضيفي إلى المفضلة",
+    outOfStock:     "نفد من المخزون",
+    lowStock:       "مخزون محدود",
+    inStock:        "متوفر",
+    preOrder:       "طلب مسبق",
+    new:            "جديد",
+    sale:           "خصم",
+    bestseller:     "الأكثر مبيعاً",
+    limited:        "إصدار محدود",
+    exclusive:      "حصري",
+    vegan:          "نباتي",
+    natural:        "طبيعي",
+    rating:         "تقييم",
+    from:           "ابتداءً من",
+    ingredients:    "المكونات الفعّالة",
+    variants:       "اختاري خيارك",
+    reviewCount:    "{{count}} تقييم",
+    shareProduct:   "مشاركة المنتج",
+  },
+
+  /* ---- Stock status ---- */
+  stock: {
+    inStock:     "متوفر",
+    lowStock:    "مخزون محدود ({{qty}} متبقٍ)",
+    outOfStock:  "نفد من المخزون",
+    preOrder:    "طلب مسبق",
+  },
+
+  /* ---- Categories ---- */
+  categoryLabels: {
+    skincare:  "العناية بالبشرة",
+    makeup:    "المكياج",
+    perfumes:  "العطور",
+    haircare:  "العناية بالشعر",
+    body:      "العناية بالجسم",
+    tools:     "الأدوات والإكسسوارات",
   },
 
   /* ---- Cart ---- */

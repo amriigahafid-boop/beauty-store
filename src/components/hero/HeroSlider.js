@@ -435,20 +435,125 @@ class Slider {
 }
 Slider._counter = 0;
 
-// ── HeroSlider: mounts all three sliders ─────────────────────────────────────
+// ── HeroSlider: builds & mounts the full hero section ────────────────────────
 class HeroSlider {
   constructor({ cartDrawer }) { this._cartDrawer = cartDrawer; }
 
   mount() {
+    const root = document.getElementById('hero-root');
+    if (!root) {
+      console.warn('[HeroSlider] #hero-root not found — hero will not render.');
+      return this;
+    }
+
+    const lang = i18n.lang;
+
+    // ── 1. Inject full hero section HTML ───────────────────────────────────
+    root.innerHTML = `
+      <section class="hero" id="hero" aria-labelledby="hero-heading">
+
+        <!-- Decorative blobs -->
+        <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+        <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
+        <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
+
+        <div class="container">
+
+          <!-- Text band -->
+          <div class="hero__text-band">
+            <span class="hero__badge" data-i18n="hero.badge">
+              ${i18n.t('hero.badge')}
+            </span>
+
+            <h1 class="hero__heading" id="hero-heading">
+              ${i18n.t('hero.heading').replace(/\n/g, '<br>')}
+            </h1>
+
+            <p class="hero__subheading">
+              ${i18n.t('hero.subheading')}
+              — <strong>${lang === 'ar' ? 'جميع الأسعار بالدرهم المغربي (DH)' : 'Tous les prix en Dirhams marocains (DH / MAD)'}</strong>.
+            </p>
+
+            <div class="hero__ctas">
+              <a href="#shop" class="btn btn--primary" id="cta-primary">
+                ${i18n.t('hero.ctaPrimary')}
+              </a>
+              <a href="#shop" class="btn btn--ghost" id="cta-secondary">
+                ${i18n.t('hero.ctaSecondary')}
+              </a>
+            </div>
+
+            <div class="hero__trust">
+              <div class="hero__trust-item">
+                <span>🌿</span>
+                <span class="hero__trust-label">${lang === 'ar' ? '100% طبيعي' : '100% Naturel'}</span>
+              </div>
+              <div class="hero__trust-item">
+                <span>🚚</span>
+                <span class="hero__trust-label">${i18n.t('cart.freeShipping')}</span>
+              </div>
+              <div class="hero__trust-item">
+                <span>🇲🇦</span>
+                <span class="hero__trust-label">${lang === 'ar' ? 'أسعار بالدرهم (MAD)' : 'Prix en DH (MAD)'}</span>
+              </div>
+              <div class="hero__trust-item">
+                <span>💎</span>
+                <span class="hero__trust-label">Premium</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slider grid -->
+          <div class="hero__slider-grid">
+            <div id="hero-slider-large"      class="hero__slider-large"></div>
+            <div id="hero-slider-small-wrap" class="hero__slider-small-wrap"></div>
+          </div>
+
+        </div>
+
+        <!-- Scroll hint -->
+        <div class="hero__scroll-hint">
+          <span>${i18n.t('hero.scrollHint')}</span>
+          <div class="hero__scroll-arrow"></div>
+        </div>
+
+      </section>
+    `;
+
+    // ── 2. Refresh hero text on language change ────────────────────────────
+    document.addEventListener('langchange', () => {
+      const l = i18n.lang;
+      const badge   = root.querySelector('.hero__badge');
+      const heading = root.querySelector('.hero__heading');
+      const sub     = root.querySelector('.hero__subheading');
+      const ctaP    = root.querySelector('#cta-primary');
+      const ctaS    = root.querySelector('#cta-secondary');
+      const scroll  = root.querySelector('.hero__scroll-hint span');
+
+      if (badge)   badge.textContent   = i18n.t('hero.badge');
+      if (heading) heading.innerHTML   = i18n.t('hero.heading').replace(/\n/g, '<br>');
+      if (sub)     sub.innerHTML       = `${i18n.t('hero.subheading')} — <strong>${l === 'ar' ? 'جميع الأسعار بالدرهم المغربي (DH)' : 'Tous les prix en Dirhams marocains (DH / MAD)'}</strong>.`;
+      if (ctaP)    ctaP.textContent    = i18n.t('hero.ctaPrimary');
+      if (ctaS)    ctaS.textContent    = i18n.t('hero.ctaSecondary');
+      if (scroll)  scroll.textContent  = i18n.t('hero.scrollHint');
+    });
+
+    // ── 3. Mount the three sliders ─────────────────────────────────────────
     const largeContainer = document.getElementById('hero-slider-large');
     const smallWrap      = document.getElementById('hero-slider-small-wrap');
-    if (!largeContainer || !smallWrap) return;
 
-    new Slider({ container: largeContainer, size: 'large',  slides: LARGE_SLIDES,     autoplayMs: 4500, cartDrawer: this._cartDrawer, enterDelay: 200 });
-    new Slider({ container: smallWrap,      size: 'small',  slides: SMALL_TOP_SLIDES,  autoplayMs: 3400, cartDrawer: this._cartDrawer, enterDelay: 360 });
-    new Slider({ container: smallWrap,      size: 'small',  slides: SMALL_BOT_SLIDES,  autoplayMs: 4000, cartDrawer: this._cartDrawer, enterDelay: 520 });
+    if (!largeContainer || !smallWrap) {
+      console.warn('[HeroSlider] Slider mount points missing after hero HTML injection.');
+      return this;
+    }
+
+    new Slider({ container: largeContainer, size: 'large', slides: LARGE_SLIDES,    autoplayMs: 4500, cartDrawer: this._cartDrawer, enterDelay: 200 });
+    new Slider({ container: smallWrap,      size: 'small', slides: SMALL_TOP_SLIDES, autoplayMs: 3400, cartDrawer: this._cartDrawer, enterDelay: 360 });
+    new Slider({ container: smallWrap,      size: 'small', slides: SMALL_BOT_SLIDES, autoplayMs: 4000, cartDrawer: this._cartDrawer, enterDelay: 520 });
+
     return this;
   }
 }
 
 export default HeroSlider;
+

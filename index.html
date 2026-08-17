@@ -38,87 +38,10 @@
   <main id="main-content">
 
     <!-- ╔══════════════════════════════════════════════╗ -->
-    <!-- ║  HERO — Slider Grid Layout                   ║ -->
+    <!-- ║  HERO (mounted by HeroSlider via main.js)    ║ -->
     <!-- ╚══════════════════════════════════════════════╝ -->
-    <section class="hero" id="hero" aria-labelledby="hero-heading">
+    <div id="hero-root"></div>
 
-      <!-- Decorative blobs -->
-      <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
-      <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
-      <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
-
-      <div class="container">
-
-        <!-- ── Text band (top) ── -->
-        <div class="hero__text-band">
-          <span class="hero__badge" data-i18n="hero.badge">Nouvelle collection 2026</span>
-
-          <h1 class="hero__heading" id="hero-heading" data-i18n-html="hero.heading">
-            La beauté,<br>en toute simplicité.
-          </h1>
-
-          <p class="hero__subheading" data-i18n="hero.subheading">
-            Découvrez nos soins naturels, maquillage de luxe et parfums d'exception —
-            <strong>tous les prix en Dirhams marocains (DH / MAD)</strong>.
-          </p>
-
-          <div class="hero__ctas">
-            <a href="#shop" class="btn btn--primary" id="cta-primary" data-i18n="hero.ctaPrimary">
-              Découvrir la collection
-            </a>
-            <a href="#shop" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
-              Nos bestsellers
-            </a>
-          </div>
-
-          <!-- Trust row -->
-          <div class="hero__trust">
-            <div class="hero__trust-item">
-              <span>🌿</span>
-              <span class="hero__trust-label">100% Naturel</span>
-            </div>
-            <div class="hero__trust-item">
-              <span>🚚</span>
-              <span class="hero__trust-label" data-i18n="cart.freeShipping">Livraison offerte</span>
-            </div>
-            <div class="hero__trust-item">
-              <span>🇲🇦</span>
-              <span class="hero__trust-label">Prix en DH (MAD)</span>
-            </div>
-            <div class="hero__trust-item">
-              <span>💎</span>
-              <span class="hero__trust-label">Premium</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Slider grid (bottom) ── -->
-        <!--
-          Layout:
-          ┌─────────────────────┬───────────────┐
-          │                     │  Small Top    │
-          │  Large Slider       ├───────────────┤
-          │  (5 products)       │  Small Bottom │
-          └─────────────────────┴───────────────┘
-        -->
-        <div class="hero__slider-grid">
-
-          <!-- Large slider: 1 col spanning both rows -->
-          <div id="hero-slider-large" class="hero__slider-large"></div>
-
-          <!-- Small sliders stacked on the right -->
-          <div id="hero-slider-small-wrap" class="hero__slider-small-wrap"></div>
-
-        </div>
-
-      </div>
-
-      <!-- Scroll hint -->
-      <div class="hero__scroll-hint">
-        <span data-i18n="hero.scrollHint">Défiler pour explorer</span>
-        <div class="hero__scroll-arrow"></div>
-      </div>
-    </section>
 
     <!-- ╔══════════════════════════════════════════════╗ -->
     <!-- ║  SHOP SECTION (injected by ShopSection.js)  ║ -->

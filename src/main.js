@@ -9,6 +9,7 @@ import i18n        from './context/i18n.js';
 import cartStore   from './context/cartStore.js';
 import Header      from './components/layout/Header.js';
 import CartDrawer  from './components/cart/CartDrawer.js';
+import HeroSlider  from './components/hero/HeroSlider.js';
 import ShopSection from './components/product/ShopSection.js';
 
 // ── 1. i18n init ──────────────────────────────────────────────────────────────
@@ -35,7 +36,11 @@ if (headerRoot) {
   });
 }
 
-// ── 4. Shop section ───────────────────────────────────────────────────────────
+// ── 4. Hero sliders ────────────────────────────────────────────────────────────────────────
+const heroSlider = new HeroSlider({ cartDrawer });
+heroSlider.mount();
+
+// ── 5. Shop section ────────────────────────────────────────────────────────────────────
 const shopRoot = document.getElementById('shop-root');
 if (shopRoot) {
   const shop = new ShopSection({ cartDrawer });

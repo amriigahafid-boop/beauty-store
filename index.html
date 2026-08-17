@@ -38,7 +38,7 @@
   <main id="main-content">
 
     <!-- ╔══════════════════════════════════════════════╗ -->
-    <!-- ║  HERO                                        ║ -->
+    <!-- ║  HERO — Slider Grid Layout                   ║ -->
     <!-- ╚══════════════════════════════════════════════╝ -->
     <section class="hero" id="hero" aria-labelledby="hero-heading">
 
@@ -48,69 +48,69 @@
       <div class="hero__blob hero__blob--3" aria-hidden="true"></div>
 
       <div class="container">
-        <div class="hero__inner">
 
-          <!-- Text column -->
-          <div class="hero__content">
-            <span class="hero__badge" data-i18n="hero.badge">Nouvelle collection 2026</span>
+        <!-- ── Text band (top) ── -->
+        <div class="hero__text-band">
+          <span class="hero__badge" data-i18n="hero.badge">Nouvelle collection 2026</span>
 
-            <h1 class="hero__heading" id="hero-heading" data-i18n-html="hero.heading">
-              La beauté,<br>en toute simplicité.
-            </h1>
+          <h1 class="hero__heading" id="hero-heading" data-i18n-html="hero.heading">
+            La beauté,<br>en toute simplicité.
+          </h1>
 
-            <p class="hero__subheading" data-i18n="hero.subheading">
-              Découvrez nos soins naturels, maquillage de luxe et parfums d'exception.
-            </p>
+          <p class="hero__subheading" data-i18n="hero.subheading">
+            Découvrez nos soins naturels, maquillage de luxe et parfums d'exception —
+            <strong>tous les prix en Dirhams marocains (DH / MAD)</strong>.
+          </p>
 
-            <div class="hero__ctas">
-              <a href="#shop" class="btn btn--primary" id="cta-primary" data-i18n="hero.ctaPrimary">
-                Découvrir la collection
-              </a>
-              <a href="#shop" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
-                Nos bestsellers
-              </a>
-            </div>
-
-            <!-- Trust badges -->
-            <div class="hero__trust">
-              <div class="hero__trust-item">
-                <span>🌿</span>
-                <span class="hero__trust-label">100% Naturel</span>
-              </div>
-              <div class="hero__trust-item">
-                <span>🚚</span>
-                <span class="hero__trust-label" data-i18n="cart.freeShipping">Livraison offerte</span>
-              </div>
-              <div class="hero__trust-item">
-                <span>💎</span>
-                <span class="hero__trust-label">Premium</span>
-              </div>
-            </div>
+          <div class="hero__ctas">
+            <a href="#shop" class="btn btn--primary" id="cta-primary" data-i18n="hero.ctaPrimary">
+              Découvrir la collection
+            </a>
+            <a href="#shop" class="btn btn--ghost" id="cta-secondary" data-i18n="hero.ctaSecondary">
+              Nos bestsellers
+            </a>
           </div>
 
-          <!-- Visual column -->
-          <div class="hero__visual" aria-hidden="true">
-            <div class="hero__card hero__card--main">
-              <div class="hero__card-glow"></div>
-              <div class="hero__product-mockup">
-                <div class="hero__product-img">🧴</div>
-                <div class="hero__product-info">
-                  <p class="hero__product-name">Sérum Éclat Rose</p>
-                  <p class="hero__product-price">199,00 DH</p>
-                </div>
-                <div class="hero__product-badge" data-i18n="product.new">Nouveau</div>
-              </div>
+          <!-- Trust row -->
+          <div class="hero__trust">
+            <div class="hero__trust-item">
+              <span>🌿</span>
+              <span class="hero__trust-label">100% Naturel</span>
             </div>
-            <div class="hero__card hero__card--floating hero__card--a">
-              <span>⭐</span> 4.9 — 2 400 avis
+            <div class="hero__trust-item">
+              <span>🚚</span>
+              <span class="hero__trust-label" data-i18n="cart.freeShipping">Livraison offerte</span>
             </div>
-            <div class="hero__card hero__card--floating hero__card--b">
-              <span>💄</span>
-              <span data-i18n="product.bestseller">Bestseller</span>
+            <div class="hero__trust-item">
+              <span>🇲🇦</span>
+              <span class="hero__trust-label">Prix en DH (MAD)</span>
+            </div>
+            <div class="hero__trust-item">
+              <span>💎</span>
+              <span class="hero__trust-label">Premium</span>
             </div>
           </div>
+        </div>
+
+        <!-- ── Slider grid (bottom) ── -->
+        <!--
+          Layout:
+          ┌─────────────────────┬───────────────┐
+          │                     │  Small Top    │
+          │  Large Slider       ├───────────────┤
+          │  (5 products)       │  Small Bottom │
+          └─────────────────────┴───────────────┘
+        -->
+        <div class="hero__slider-grid">
+
+          <!-- Large slider: 1 col spanning both rows -->
+          <div id="hero-slider-large" class="hero__slider-large"></div>
+
+          <!-- Small sliders stacked on the right -->
+          <div id="hero-slider-small-wrap" class="hero__slider-small-wrap"></div>
 
         </div>
+
       </div>
 
       <!-- Scroll hint -->

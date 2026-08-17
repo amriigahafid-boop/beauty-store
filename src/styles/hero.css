@@ -224,109 +224,114 @@
   will-change: transform;
 }
 
-/* Slide */
+/* ── Slide ── */
 .hs__slide {
   min-width: 100%;
   height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-end;
   overflow: hidden;
 }
 
-/* Slide background gradient */
-.hs__slide::before {
+/* Full-bleed banner image */
+.hs__bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center; /* overridden inline per slide */
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Subtle Ken-Burns on the active slide's image */
+.hs__track .hs__slide:first-child .hs__bg-img {
+  animation: kenBurns 8s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.04); }
+}
+
+/* Per-slide colour tint layer */
+.hs__tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Bottom gradient scrim so info card text is always legible */
+.hs__slide::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--slide-bg, linear-gradient(160deg, #fde8ef 0%, #f0e4f8 100%));
-  z-index: 0;
-  transition: background 0.4s ease;
-}
-
-/* Product emoji */
-.hs__emoji {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
-  font-size: 7rem;
-  filter: drop-shadow(0 16px 32px rgba(200,96,122,0.25));
-  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(20, 10, 15, 0.72) 0%,
+    rgba(20, 10, 15, 0.30) 45%,
+    transparent 70%
+  );
+  z-index: 2;
   pointer-events: none;
-  transition: transform 0.55s cubic-bezier(0.25,0.8,0.25,1);
-  animation: productFloat 4s ease-in-out infinite;
 }
 
-.hs--small .hs__emoji {
-  font-size: 4.2rem;
-  transform: translate(-50%, -55%);
-}
-
-@keyframes productFloat {
-  0%, 100% { transform: translate(-50%, -60%) translateY(0); }
-  50%       { transform: translate(-50%, -60%) translateY(-12px); }
-}
-
-.hs--small .hs__emoji {
-  animation: productFloatSm 3.5s ease-in-out infinite;
-}
-
-@keyframes productFloatSm {
-  0%, 100% { transform: translate(-50%, -55%) translateY(0); }
-  50%       { transform: translate(-50%, -55%) translateY(-8px); }
-}
-
-/* ── Slide info card (bottom overlay) ───────────────────── */
+/* ── Info card overlay ───────────────────────────────────── */
 .hs__info {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
-  padding: var(--sp-5) var(--sp-5) var(--sp-6);
-  background: rgba(255,255,255,0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255,255,255,0.6);
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  /* No background — the scrim (::after) makes text readable */
 }
 
 .hs--small .hs__info {
   padding: var(--sp-3) var(--sp-4) var(--sp-4);
 }
 
-.hs__info-top {
+/* Brand + rating on one line */
+.hs__info-meta {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sp-2);
-  margin-bottom: var(--sp-2);
 }
 
-[dir="rtl"] .hs__info-top { flex-direction: row-reverse; }
+[dir="rtl"] .hs__info-meta { flex-direction: row-reverse; }
 
 .hs__brand {
   font-size: 10px;
   font-weight: var(--fw-bold);
-  letter-spacing: 0.10em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: rgba(255,255,255,0.7);
 }
 
 .hs__name {
-  font-size: var(--fs-base);
+  font-size: var(--fs-md);
   font-weight: var(--fw-bold);
-  color: var(--color-text);
+  color: #fff;
   line-height: var(--lh-snug);
-  margin-bottom: var(--sp-1);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
-.hs--small .hs__name { font-size: var(--fs-sm); }
+.hs--small .hs__name {
+  font-size: var(--fs-sm);
+}
 
 .hs__tagline {
   font-size: var(--fs-xs);
-  color: var(--color-text-muted);
-  margin-bottom: var(--sp-3);
+  color: rgba(255,255,255,0.75);
+  line-height: var(--lh-snug);
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -335,12 +340,24 @@
 
 .hs--small .hs__tagline { display: none; }
 
-/* Price */
+/* Price + CTA row */
+.hs__info-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-1);
+  flex-wrap: wrap;
+}
+
+[dir="rtl"] .hs__info-bottom { flex-direction: row-reverse; }
+
 .hs__price-row {
   display: flex;
   align-items: baseline;
   gap: var(--sp-2);
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 [dir="rtl"] .hs__price-row { flex-direction: row-reverse; }
@@ -348,51 +365,43 @@
 .hs__price {
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
 }
 
 .hs--small .hs__price { font-size: var(--fs-base); }
 
 .hs__price-original {
   font-size: var(--fs-sm);
-  color: var(--color-text-muted);
+  color: rgba(255,255,255,0.55);
   text-decoration: line-through;
 }
 
-.hs__price-badge {
-  font-size: 11px;
-  font-weight: var(--fw-bold);
-  background: rgba(200,96,122,0.12);
-  color: var(--color-primary-dark);
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-}
 
 .hs__currency {
   font-size: 11px;
   font-weight: var(--fw-bold);
-  color: var(--color-text-muted);
+  color: rgba(255,255,255,0.9);
   letter-spacing: 0.04em;
-  background: var(--color-surface-2);
-  padding: 2px 6px;
+  background: rgba(255,255,255,0.18);
+  padding: 2px 7px;
   border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.25);
+  flex-shrink: 0;
 }
 
-/* CTA row */
-.hs__cta-row {
+/* Rating */
+.hs__rating {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  margin-top: var(--sp-3);
+  gap: 3px;
+  font-size: var(--fs-xs);
+  color: rgba(255,255,255,0.75);
+  white-space: nowrap;
 }
 
-[dir="rtl"] .hs__cta-row { flex-direction: row-reverse; }
-.hs--small .hs__cta-row  { margin-top: var(--sp-2); }
+.hs__rating-stars { color: #f5c842; letter-spacing: -1px; }
 
 .hs__add-btn {
   display: inline-flex;
@@ -406,11 +415,13 @@
   font-weight: var(--fw-semibold);
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(200,96,122,0.30);
+  box-shadow: 0 4px 14px rgba(200,96,122,0.40);
   transition:
     transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .hs__add-btn:hover {
@@ -428,24 +439,12 @@
   font-size: 11px;
 }
 
-/* Rating */
-.hs__rating {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: var(--fs-xs);
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-.hs__rating-stars { color: #f5c842; letter-spacing: -1px; }
-
 /* Badge label (NEW / SALE etc.) */
 .hs__badge-label {
   position: absolute;
   top: var(--sp-4);
   left: var(--sp-4);
-  z-index: 3;
+  z-index: 5;
   padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: 11px;
@@ -456,9 +455,9 @@
 
 [dir="rtl"] .hs__badge-label { left: auto; right: var(--sp-4); }
 
-.hs__badge-label--new        { background: #e8f8f0; color: #2e7d55; }
-.hs__badge-label--sale       { background: #ffeef2; color: var(--color-primary-dark); }
-.hs__badge-label--bestseller { background: #fff8e1; color: #b8860b; }
+.hs__badge-label--new        { background: rgba(255,255,255,0.92); color: #2e7d55; }
+.hs__badge-label--sale       { background: rgba(255,255,255,0.92); color: var(--color-primary-dark); }
+.hs__badge-label--bestseller { background: rgba(255,255,255,0.92); color: #b8860b; }
 .hs__badge-label--exclusive  { background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; }
 
 /* Wishlist pill */
@@ -500,9 +499,8 @@
   z-index: 10;
 }
 
-/* Push dots above info card */
-.hs__dots { bottom: calc(var(--info-height, 170px) + var(--sp-3)); }
-.hs--small .hs__dots { bottom: calc(var(--info-height-sm, 115px) + var(--sp-2)); }
+/* Dots float above the bottom of the slide, above the info text area */
+.hs__dots { bottom: var(--sp-4); }
 
 .hs__dot {
   width: 8px;

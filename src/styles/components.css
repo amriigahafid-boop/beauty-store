@@ -3,28 +3,38 @@
    ============================================================ */
 
 /* ── Product Badges ──────────────────────────────────────── */
+.badge,
+.tag,
+.product-badges,
+.badge-promo,
+.badge-bestseller,
+.badge-vegan,
+.badge-naturel {
+  display: none !important;
+}
+
 .badge {
-  display: inline-flex;
   align-items: center;
   gap: var(--sp-1);
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  font-size: 10px;
-  font-weight: var(--fw-bold);
+  padding: 3px 8px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.4;
   white-space: nowrap;
+  width: auto !important;
 }
 
-.badge--new        { background: #e8f8f0; color: #2e7d55; }
-.badge--sale       { background: #ffeef2; color: var(--color-primary-dark); }
-.badge--bestseller { background: #fff8e1; color: #b8860b; }
-.badge--limited    { background: #f3eeff; color: var(--color-secondary); }
-.badge--exclusive  { background: linear-gradient(135deg,var(--color-primary),var(--color-secondary)); color:#fff; }
-.badge--vegan      { background: #e8f8f0; color: #2e7d55; }
-.badge--natural    { background: #f0f8e8; color: #4a7c2e; }
-.badge--low-stock  { background: #fff3e0; color: #e65100; }
+.badge--sale       { background: #D84A56 !important; color: #ffffff !important; display: none !important; }
+.badge--new        { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--bestseller { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--limited    { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--exclusive  { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--vegan      { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--natural    { background: #F4EBE6 !important; color: #5A3E36 !important; display: none !important; }
+.badge--low-stock  { background: var(--color-warning) !important; color: #111111 !important; display: none !important; }
 
 /* ── Star Rating ──────────────────────────────────────────── */
 .star-rating {

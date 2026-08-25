@@ -132,30 +132,23 @@ class ShopSection {
           <div class="trust-strip__inner">
             <div class="trust-item">
               <div class="trust-item__icon">🚚</div>
-              <div>
-                <div class="trust-item__title">${lang === 'ar' ? 'شحن مجاني' : 'Livraison offerte'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'من 500 د.م' : 'Dès 500 DH d\'achat'}</div>
+              <div class="trust-item__text">
+                <div class="trust-item__title">${lang === 'ar' ? 'توصيل مجاني' : 'Livraison offerte'}</div>
+                <div class="trust-item__desc">${lang === 'ar' ? 'ابتداءً من 399 درهم من المشتريات' : 'Dès 399 DH d\'achat'}</div>
               </div>
             </div>
             <div class="trust-item">
-              <div class="trust-item__icon">🔒</div>
-              <div>
-                <div class="trust-item__title">${lang === 'ar' ? 'دفع آمن 100%' : 'Paiement 100% sécurisé'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'بروتوكول SSL معتمد' : 'Protocole SSL certifié'}</div>
+              <div class="trust-item__icon">💵</div>
+              <div class="trust-item__text">
+                <div class="trust-item__title">${lang === 'ar' ? 'الدفع عند الاستلام' : 'Paiement à la livraison'}</div>
+                <div class="trust-item__desc">${lang === 'ar' ? 'ادفع بكل أمان عند استلام طلبك' : 'Payez en toute confiance à la réception'}</div>
               </div>
             </div>
             <div class="trust-item">
               <div class="trust-item__icon">↩️</div>
-              <div>
-                <div class="trust-item__title">${lang === 'ar' ? 'إرجاع مجاني 30 يوماً' : 'Retours gratuits 30 jours'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'بدون شروط' : 'Sans condition'}</div>
-              </div>
-            </div>
-            <div class="trust-item">
-              <div class="trust-item__icon">💬</div>
-              <div>
-                <div class="trust-item__title">${lang === 'ar' ? 'دعم العملاء 7/7' : 'Support 7j/7'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'فريق متوفر دائماً' : 'Équipe disponible'}</div>
+              <div class="trust-item__text">
+                <div class="trust-item__title">${lang === 'ar' ? 'إرجاع سهل' : 'Retours faciles'}</div>
+                <div class="trust-item__desc">${lang === 'ar' ? 'إذا كان المنتج غير مفتوح وغير مستعمل' : 'Produit non ouvert & non utilisé'}</div>
               </div>
             </div>
           </div>
@@ -204,8 +197,6 @@ class ShopSection {
         <div class="product-card__image-wrap">
           <div class="product-card__image">${emoji}</div>
 
-          ${badges ? `<div class="product-card__badges">${badges}</div>` : ''}
-
           <button
             class="product-card__wishlist ${isWished ? 'active' : ''}"
             data-id="${product.id}"
@@ -214,7 +205,6 @@ class ShopSection {
           >${isWished ? '❤️' : '🤍'}</button>
 
           ${isOOS ? `<div class="product-card__oos-overlay">${i18n.t('product.outOfStock')}</div>` : ''}
-          ${product.stock.status === 'low_stock' ? `<div class="product-card__badges" style="bottom:var(--sp-3);top:auto;left:var(--sp-3)"><span class="badge badge--low-stock">⚠ ${i18n.t('product.lowStock')}</span></div>` : ''}
         </div>
 
         <!-- Body -->
@@ -244,7 +234,9 @@ class ShopSection {
             ${isOOS ? 'disabled' : ''}
             aria-label="${i18n.t('product.addToCart')}: ${name}"
           >
-            <span class="product-card__cta-icon">🛒</span>
+            <span class="product-card__cta-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            </span>
             <span>${isOOS ? i18n.t('product.outOfStock') : i18n.t('product.addToCart')}</span>
           </button>
         </div>

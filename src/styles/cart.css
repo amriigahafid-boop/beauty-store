@@ -180,23 +180,25 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-6);
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
+  padding: var(--sp-3) var(--sp-6) !important;
+  border-radius: 999px !important;
+  background: #93385F !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   text-decoration: none;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  box-shadow: 0 4px 14px rgba(200,96,122,0.30);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  box-shadow: 0 4px 14px rgba(147, 56, 95, 0.25);
   cursor: pointer;
-  border: none;
+  border: none !important;
 }
 
 .cart-empty__cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(200,96,122,0.40);
-  color: #fff;
+  box-shadow: 0 8px 20px rgba(147, 56, 95, 0.35);
+  background: #A64B72 !important;
+  color: #ffffff !important;
   text-decoration: none;
 }
 
@@ -364,10 +366,7 @@
 }
 
 .cart-totals__row--total .cart-totals__amount {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary-cta);
   font-size: var(--fs-lg);
 }
 
@@ -379,10 +378,11 @@
 /* Checkout button */
 .cart-checkout-btn {
   width: 100%;
-  padding: var(--sp-4) var(--sp-5);
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #fff;
+  padding: var(--sp-4) var(--sp-5) !important;
+  border-radius: 999px !important;
+  background: #93385F !important;
+  color: #ffffff !important;
+  fill: #ffffff !important;
   font-size: var(--fs-base);
   font-weight: var(--fw-bold);
   display: flex;
@@ -390,18 +390,20 @@
   justify-content: center;
   gap: var(--sp-3);
   cursor: pointer;
-  border: none;
-  box-shadow: 0 6px 24px rgba(200, 96, 122, 0.38);
+  border: none !important;
+  box-shadow: 0 6px 24px rgba(147, 56, 95, 0.25);
   transition:
     transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
   text-decoration: none;
 }
 
 .cart-checkout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(200, 96, 122, 0.50);
-  color: #fff;
+  box-shadow: 0 10px 30px rgba(147, 56, 95, 0.35);
+  background: #A64B72 !important;
+  color: #ffffff !important;
   text-decoration: none;
 }
 

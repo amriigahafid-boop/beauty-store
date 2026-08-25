@@ -251,14 +251,6 @@ function renderCheckout() {
               }).join('')}
             </div>
 
-            <!-- Promo code -->
-            <div class="promo-row">
-              <input type="text" class="promo-row__input" id="promo-input"
-                placeholder="${lang === 'ar' ? 'كود الخصم' : 'Code promo'}" />
-              <button class="promo-row__btn" id="promo-btn">
-                ${lang === 'ar' ? 'تطبيق' : 'Appliquer'}
-              </button>
-            </div>
 
             <div class="checkout-summary__totals">
               <div class="summary-row">
@@ -314,15 +306,6 @@ function _bindCheckoutEvents(lang, summary) {
     }
   });
 
-  // Promo code
-  document.getElementById('promo-btn')?.addEventListener('click', () => {
-    const code = document.getElementById('promo-input')?.value.trim().toUpperCase();
-    if (code === 'LUMIERE10') {
-      showToast(lang === 'ar' ? '🎉 تم تطبيق خصم 10%!' : '🎉 Réduction de 10% appliquée !', { type: 'success', icon: '🎉' });
-    } else if (code) {
-      showToast(lang === 'ar' ? '❌ كود غير صالح' : '❌ Code invalide', { type: 'error', icon: '❌' });
-    }
-  });
 
   // Submit
   document.getElementById('checkout-submit-btn')?.addEventListener('click', () => {

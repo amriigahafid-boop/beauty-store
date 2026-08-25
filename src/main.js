@@ -13,11 +13,11 @@
  */
 
 import i18n        from './context/i18n.js';
-import cartStore   from './context/cartStore.js';
-import Header      from './components/layout/Header.js';
-import CartDrawer  from './components/cart/CartDrawer.js';
-import HeroSlider  from './components/hero/HeroSlider.js';
-import ShopSection from './components/product/ShopSection.js';
+import cartStore    from './context/cartStore.js';
+import Header       from './components/layout/Header.js';
+import CartDrawer   from './components/cart/CartDrawer.js';
+import HeroCarousel from './components/hero/HeroCarousel.js';
+import ShopSection  from './components/product/ShopSection.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── 4. Hero sliders ────────────────────────────────────────────────────────
-  new HeroSlider({ cartDrawer }).mount();
+  // ── 4. Hero Carousel ─────────────────────────
+  new HeroCarousel().mount();
 
   // ── 5. Shop section ────────────────────────────────────────────────────────
   const shopRoot = document.getElementById('shop-root');

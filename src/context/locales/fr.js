@@ -130,7 +130,9 @@ const fr = {
 
   /* ---- Footer ---- */
   footer: {
-    tagline:     "Votre destination beauté premium.",
+    brand:       "Lumière",
+    tagline:     "Soins d'exception importés directement de Turquie pour sublimer votre peau au quotidien.",
+    prices:      "Tous les prix en DH (MAD)",
     newsletter:  "Abonnez-vous à notre newsletter",
     newsletterPlaceholder: "Votre adresse e-mail",
     subscribe:   "S'abonner",

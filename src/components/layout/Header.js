@@ -226,6 +226,24 @@ class Header {
 
     // Listen for external language changes (e.g. other components)
     document.addEventListener('langchange', () => this._refresh());
+
+    // Mobile menu toggle
+    const hamburger = el.querySelector('#btn-hamburger');
+    const nav = el.querySelector('#main-nav');
+    if (hamburger && nav) {
+      hamburger.addEventListener('click', () => {
+        const isOpen = nav.classList.toggle('is-open');
+        hamburger.setAttribute('aria-expanded', isOpen);
+      });
+      
+      // Close menu on link click
+      nav.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+          nav.classList.remove('is-open');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
   }
 
   // ── Refresh after language change ────────────────────────────────────────

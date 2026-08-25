@@ -11,6 +11,14 @@
   --color-secondary-light:#b09de0;
   --color-accent:         #f5c842;   /* Or chaud */
 
+  /* --- Luxury Minimalist Refactor --- */
+  --color-primary-cta:      #111111;
+  --color-primary-cta-text: #ffffff;
+  --color-discount-badge:   #e63946;
+  --color-accent-badge:     #d4af37;
+  --color-card-bg:          #ffffff;
+  --color-border-light:     #f0f0f0;
+
   /* --- Neutrals --- */
   --color-bg:             #fdf6f8;
   --color-surface:        #ffffff;

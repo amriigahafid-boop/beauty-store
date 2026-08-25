@@ -20,13 +20,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
   <!-- Stylesheets (order matters) -->
-  <link rel="stylesheet" href="src/styles/variables.css" />
-  <link rel="stylesheet" href="src/styles/global.css" />
-  <link rel="stylesheet" href="src/styles/components.css" />
-  <link rel="stylesheet" href="src/styles/header.css" />
-  <link rel="stylesheet" href="src/styles/hero.css" />
-  <link rel="stylesheet" href="src/styles/shop.css" />
-  <link rel="stylesheet" href="src/styles/cart.css" />
+  <link rel="stylesheet" href="src/styles/variables.css?v=2" />
+  <link rel="stylesheet" href="src/styles/global.css?v=2" />
+  <link rel="stylesheet" href="src/styles/components.css?v=2" />
+  <link rel="stylesheet" href="src/styles/header.css?v=2" />
+  <link rel="stylesheet" href="src/styles/hero.css?v=2" />
+  <link rel="stylesheet" href="src/styles/shop.css?v=2" />
+  <link rel="stylesheet" href="src/styles/cart.css?v=2" />
 </head>
 
 <body>
@@ -38,9 +38,11 @@
   <main id="main-content">
 
     <!-- ╔══════════════════════════════════════════════╗ -->
-    <!-- ║  HERO (mounted by HeroSlider via main.js)    ║ -->
+    <!-- ║  HERO CAROUSEL                               ║ -->
     <!-- ╚══════════════════════════════════════════════╝ -->
-    <div id="hero-root"></div>
+    <section class="hero" id="hero" aria-labelledby="hero-heading">
+      <div id="hero-carousel-root"></div>
+    </section>
 
 
     <!-- ╔══════════════════════════════════════════════╗ -->
@@ -56,12 +58,12 @@
   <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>
-        <span class="site-footer__brand">Lumière</span>
-        — <span data-i18n="footer.tagline">Votre destination beauté premium.</span>
+        <span class="site-footer__brand" data-i18n="footer.brand">Lumière</span>
+        — <span data-i18n="footer.tagline">Soins d'exception importés directement de Turquie pour sublimer votre peau au quotidien.</span>
       </p>
       <p class="site-footer__copy">
-        © 2026 Lumière. <span data-i18n="footer.rights">Tous droits réservés.</span>
-        · <span style="color:var(--color-primary);">🇲🇦 Tous les prix en DH (MAD)</span>
+        © 2026 <span data-i18n="footer.brand">Lumière</span>. <span data-i18n="footer.rights">Tous droits réservés.</span>
+        · <span style="color:var(--color-primary);">🇲🇦 <span data-i18n="footer.prices">Tous les prix en DH (MAD)</span></span>
       </p>
     </div>
   </footer>

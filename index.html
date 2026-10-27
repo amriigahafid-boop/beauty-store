@@ -18,15 +18,17 @@
   <!-- Preconnect for fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets (order matters) -->
-  <link rel="stylesheet" href="src/styles/variables.css?v=2" />
-  <link rel="stylesheet" href="src/styles/global.css?v=2" />
-  <link rel="stylesheet" href="src/styles/components.css?v=2" />
-  <link rel="stylesheet" href="src/styles/header.css?v=2" />
-  <link rel="stylesheet" href="src/styles/hero.css?v=2" />
-  <link rel="stylesheet" href="src/styles/shop.css?v=2" />
-  <link rel="stylesheet" href="src/styles/cart.css?v=2" />
+  <link rel="stylesheet" href="src/styles/variables.css?v=25" />
+  <link rel="stylesheet" href="src/styles/global.css?v=25" />
+  <link rel="stylesheet" href="src/styles/components.css?v=25" />
+  <link rel="stylesheet" href="src/styles/header.css?v=25" />
+  <link rel="stylesheet" href="src/styles/hero.css?v=25" />
+  <link rel="stylesheet" href="src/styles/shop.css?v=25" />
+  <link rel="stylesheet" href="src/styles/home-sections.css?v=25" />
+  <link rel="stylesheet" href="src/styles/cart.css?v=25" />
 </head>
 
 <body>
@@ -44,11 +46,20 @@
       <div id="hero-carousel-root"></div>
     </section>
 
+    <!-- ╔══════════════════════════════════════════════╗ -->
+    <!-- ║  TOP HOMEPAGE SECTIONS (Concerns & Brands)  ║ -->
+    <!-- ╚══════════════════════════════════════════════╝ -->
+    <div id="home-top-sections"></div>
 
     <!-- ╔══════════════════════════════════════════════╗ -->
     <!-- ║  SHOP SECTION (injected by ShopSection.js)  ║ -->
     <!-- ╚══════════════════════════════════════════════╝ -->
     <div id="shop-root"></div>
+
+    <!-- ╔══════════════════════════════════════════════╗ -->
+    <!-- ║  BOTTOM SECTIONS (Bundles, Reviews & FAQ)   ║ -->
+    <!-- ╚══════════════════════════════════════════════╝ -->
+    <div id="home-bottom-sections"></div>
 
   </main>
 
@@ -69,6 +80,6 @@
   </footer>
 
   <!-- App entry point -->
-  <script type="module" src="src/main.js"></script>
+  <script type="module" src="src/main.js?v=25"></script>
 </body>
 </html>

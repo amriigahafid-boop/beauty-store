@@ -1,24 +1,20 @@
 /**
  * Header Component
- * Beauty Store
+ * Lumière Beauty Store — src/components/layout/Header.js
  *
  * Renders the sticky header with:
- *  - Brand logo
- *  - Navigation links (auto-translated)
- *  - Icon action buttons (search, wishlist, cart)
- *  - Language toggle button (FR ↔ AR + RTL switch)
- *
- * Usage:
- *   import Header from './src/components/layout/Header.js';
- *   const header = new Header({ cartCount: 3 });
- *   document.body.prepend(header.render());
+ *  - Moving Announcement Bar (translated via i18n.t('announcement'))
+ *  - Brand logo (translated via i18n.t('footer.brand'))
+ *  - Navigation links (translated via i18n.t('nav.*'))
+ *  - Icon action buttons (search, wishlist, cart, account)
+ *  - Language toggle button (FR ↔ AR + immediate RTL/LTR switch)
  */
 
 import i18n from '../../context/i18n.js';
 
 // ── SVG Icons (inline — no external dependency needed) ─────────────────────
 const Icons = {
-  logo: '💄',
+  logo: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>`,
 
   search: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -42,9 +38,9 @@ const Icons = {
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
   </svg>`,
 
-  check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>`,
+  truck: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>`,
+
+  sparkle: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`,
 
   menu: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -53,13 +49,12 @@ const Icons = {
 
 // ── Nav links configuration ────────────────────────────────────────────────
 const NAV_LINKS = [
-  { key: 'nav.home',      href: '#',        id: 'nav-home'      },
-  { key: 'nav.shop',      href: '#shop',    id: 'nav-shop'      },
-  { key: 'nav.skincare',  href: '#skincare',id: 'nav-skincare'  },
-  { key: 'nav.makeup',    href: '#makeup',  id: 'nav-makeup'    },
-  { key: 'nav.perfumes',  href: '#perfumes',id: 'nav-perfumes'  },
-  { key: 'nav.brands',    href: '#brands',  id: 'nav-brands'    },
-  { key: 'nav.sale',      href: '#sale',    id: 'nav-sale', badge: true },
+  { key: 'nav.home',   href: '#',       id: 'nav-home'   },
+  { key: 'nav.shop',   href: '#shop',   id: 'nav-shop'   },
+  { key: 'nav.hair',   href: '#hair',   id: 'nav-hair'   },
+  { key: 'nav.body',   href: '#body',   id: 'nav-body'   },
+  { key: 'nav.brands', href: '#brands', id: 'nav-brands' },
+  { key: 'nav.sale',   href: '#sale',   id: 'nav-sale', badge: true },
 ];
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -68,122 +63,194 @@ class Header {
    * @param {{ cartCount?: number, wishlistCount?: number }} [options]
    */
   constructor({ cartCount = 0, wishlistCount = 0 } = {}) {
-    this.cartCount      = cartCount;
-    this.wishlistCount  = wishlistCount;
-    this._el            = null; // cached DOM reference
+    this.cartCount     = cartCount;
+    this.wishlistCount = wishlistCount;
+    this._el           = null;
+    this._globalBound  = false;
+
+    this._onLangChange = () => this._refresh();
+    this._onScroll     = () => {
+      if (this._el) {
+        this._el.classList.toggle('header--scrolled', window.scrollY > 10);
+      }
+    };
+  }
+
+  _resolveHref(hashHref) {
+    const isHomePage =
+      window.location.pathname.endsWith('/') ||
+      window.location.pathname.endsWith('/index.html') ||
+      Boolean(document.getElementById('shop-root'));
+    if (isHomePage) return hashHref;
+    return hashHref === '#' ? 'index.html' : `index.html${hashHref}`;
   }
 
   // ── Build HTML string ────────────────────────────────────────────────────
   _buildHTML() {
-    const locale = i18n.locale;
+    const isAr = i18n.lang === 'ar';
 
-    const navLinks = NAV_LINKS.map(link => `
-      <a
-        href="${link.href}"
-        id="${link.id}"
-        class="header__nav-link${link.id === 'nav-home' ? ' active' : ''}"
-        data-i18n="${link.key}"
-        aria-label="${i18n.t(link.key)}"
-      >${i18n.t(link.key)}</a>
-    `).join('');
+    const navLinks = NAV_LINKS.map(link => {
+      const label = i18n.t(link.key);
+      const href  = this._resolveHref(link.href);
+      return `
+        <a
+          href="${href}"
+          id="${link.id}"
+          class="header__nav-link${link.id === 'nav-home' ? ' active' : ''}"
+          data-i18n="${link.key}"
+          aria-label="${label}"
+        >${label}</a>
+      `;
+    }).join('');
 
-    const nextLang  = i18n.lang === 'fr' ? 'ar' : 'fr';
-    const nextLocale = nextLang === 'fr'
-      ? { flag: '🇫🇷', label: 'Français', code: 'FR' }
-      : { flag: '🇸🇦', label: 'عربي',     code: 'AR' };
+    const nextLocale = isAr
+      ? { flag: '🇫🇷', label: i18n.t('langSwitcher.switchToFr'), code: 'FR' }
+      : { flag: '🇲🇦', label: i18n.t('langSwitcher.switchToAr'), code: 'العربية' };
+
+    const announcementText = i18n.t('announcement');
+    const brandName        = i18n.t('footer.brand');
+    const homeHref         = this._resolveHref('#');
 
     return `
       <header class="header" id="site-header" role="banner">
-        <div class="container">
-          <div class="header__inner">
 
-            <!-- ── Brand ──────────────────────────────────────── -->
-            <a href="#" class="header__logo" aria-label="Beauty Store – Accueil">
-              <div class="header__logo-icon" aria-hidden="true">${Icons.logo}</div>
-              <span class="header__logo-text">Lumière</span>
-            </a>
-
-            <!-- ── Navigation ─────────────────────────────────── -->
-            <nav class="header__nav" id="main-nav" role="navigation" aria-label="${i18n.t('nav.home')}">
-              ${navLinks}
-            </nav>
-
-            <!-- ── Right actions ──────────────────────────────── -->
-            <div class="header__actions">
-
-              <!-- Search -->
-              <button
-                class="header__icon-btn"
-                id="btn-search"
-                aria-label="${i18n.t('actions.search')}"
-                title="${i18n.t('actions.search')}"
-              >
-                ${Icons.search}
-              </button>
-
-              <!-- Wishlist -->
-              <button
-                class="header__icon-btn"
-                id="btn-wishlist"
-                aria-label="${i18n.t('actions.wishlist')}"
-                title="${i18n.t('actions.wishlist')}"
-              >
-                ${Icons.heart}
-                ${this.wishlistCount > 0
-                  ? `<span class="header__badge" aria-label="${this.wishlistCount} articles">${this.wishlistCount}</span>`
-                  : ''}
-              </button>
-
-              <!-- Cart -->
-              <button
-                class="header__icon-btn"
-                id="btn-cart"
-                aria-label="${i18n.t('actions.cart')}"
-                title="${i18n.t('actions.cart')}"
-              >
-                ${Icons.cart}
-                ${this.cartCount > 0
-                  ? `<span class="header__badge" aria-label="${this.cartCount} articles">${this.cartCount}</span>`
-                  : ''}
-              </button>
-
-              <!-- Account -->
-              <button
-                class="header__icon-btn"
-                id="btn-account"
-                aria-label="${i18n.t('actions.account')}"
-                title="${i18n.t('actions.account')}"
-              >
-                ${Icons.user}
-              </button>
-
-              <!-- ── Language Toggle ───────────────────────────── -->
-              <button
-                class="lang-toggle"
-                id="lang-toggle-btn"
-                data-lang="${i18n.lang}"
-                aria-label="${i18n.t('actions.toggleLang')}"
-                title="${i18n.t('actions.toggleLang')}"
-                type="button"
-              >
-                <span class="lang-toggle__icon" aria-hidden="true">${Icons.globe}</span>
-                <span class="lang-toggle__flag" aria-hidden="true">${nextLocale.flag}</span>
-                <span class="lang-toggle__code">${nextLocale.code}</span>
-              </button>
-
-              <!-- Hamburger (mobile) -->
-              <button
-                class="header__hamburger header__icon-btn"
-                id="btn-hamburger"
-                aria-label="Menu"
-                aria-expanded="false"
-                aria-controls="main-nav"
-              >
-                ${Icons.menu}
-              </button>
+        <!-- ── Top Moving Announcement Bar (Marquee) ─────── -->
+        <div class="announcement-bar" role="region" aria-label="${announcementText}">
+          <div class="announcement-bar__track">
+            <div class="announcement-bar__items">
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.truck}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.sparkle}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.truck}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
             </div>
-            <!-- /header__actions -->
+            <div class="announcement-bar__items" aria-hidden="true">
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.truck}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.sparkle}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
+              <span class="announcement-bar__item">
+                <span class="announcement-bar__icon" aria-hidden="true">${Icons.truck}</span>
+                <span data-i18n="announcement">${announcementText}</span>
+              </span>
+              <span class="announcement-bar__sep" aria-hidden="true">✦</span>
+            </div>
+          </div>
+        </div>
 
+        <div class="header__main">
+          <div class="container">
+            <div class="header__inner">
+
+              <!-- ── Brand ──────────────────────────────────────── -->
+              <a href="${homeHref}" class="header__logo" aria-label="${brandName} – ${i18n.t('nav.home')}">
+                <div class="header__logo-icon" aria-hidden="true">${Icons.logo}</div>
+                <span class="header__logo-text" data-i18n="footer.brand">${brandName}</span>
+              </a>
+
+              <!-- ── Navigation ─────────────────────────────────── -->
+              <nav class="header__nav" id="main-nav" role="navigation" aria-label="${i18n.t('nav.home')}">
+                ${navLinks}
+              </nav>
+
+              <!-- ── Right actions ──────────────────────────────── -->
+              <div class="header__actions">
+
+                <!-- Search -->
+                <button
+                  class="header__icon-btn"
+                  id="btn-search"
+                  aria-label="${i18n.t('actions.search')}"
+                  title="${i18n.t('actions.search')}"
+                  type="button"
+                >
+                  ${Icons.search}
+                </button>
+
+                <!-- Wishlist -->
+                <button
+                  class="header__icon-btn"
+                  id="btn-wishlist"
+                  aria-label="${i18n.t('actions.wishlist')}"
+                  title="${i18n.t('actions.wishlist')}"
+                  type="button"
+                >
+                  ${Icons.heart}
+                  ${this.wishlistCount > 0
+                    ? `<span class="header__badge" aria-label="${i18n.t('actions.itemsCount', { count: this.wishlistCount })}">${this.wishlistCount}</span>`
+                    : ''}
+                </button>
+
+                <!-- Cart -->
+                <button
+                  class="header__icon-btn"
+                  id="btn-cart"
+                  aria-label="${i18n.t('actions.cart')}"
+                  title="${i18n.t('actions.cart')}"
+                  type="button"
+                >
+                  ${Icons.cart}
+                  ${this.cartCount > 0
+                    ? `<span class="header__badge" aria-label="${i18n.t('actions.itemsCount', { count: this.cartCount })}">${this.cartCount}</span>`
+                    : ''}
+                </button>
+
+                <!-- Account -->
+                <button
+                  class="header__icon-btn"
+                  id="btn-account"
+                  aria-label="${i18n.t('actions.account')}"
+                  title="${i18n.t('actions.account')}"
+                  type="button"
+                >
+                  ${Icons.user}
+                </button>
+
+                <!-- ── Language Toggle ───────────────────────────── -->
+                <button
+                  class="lang-toggle"
+                  id="lang-toggle-btn"
+                  data-lang="${i18n.lang}"
+                  aria-label="${i18n.t('actions.toggleLang')}"
+                  title="${i18n.t('actions.toggleLang')}"
+                  type="button"
+                >
+                  <span class="lang-toggle__icon" aria-hidden="true">${Icons.globe}</span>
+                  <span class="lang-toggle__flag" aria-hidden="true">${nextLocale.flag}</span>
+                  <span class="lang-toggle__code">${nextLocale.code}</span>
+                </button>
+
+                <!-- Hamburger (mobile) -->
+                <button
+                  class="header__hamburger header__icon-btn"
+                  id="btn-hamburger"
+                  aria-label="${i18n.t('nav.menu')}"
+                  aria-expanded="false"
+                  aria-controls="main-nav"
+                  type="button"
+                >
+                  ${Icons.menu}
+                </button>
+              </div>
+              <!-- /header__actions -->
+
+            </div>
           </div>
         </div>
       </header>
@@ -193,52 +260,51 @@ class Header {
   // ── Render ───────────────────────────────────────────────────────────────
   /**
    * Create and return the header DOM element.
-   * Attaches event listeners for the language toggle.
    *
    * @returns {HTMLElement}
    */
   render() {
-    const wrapper    = document.createElement('div');
+    const wrapper     = document.createElement('div');
     wrapper.innerHTML = this._buildHTML().trim();
     this._el          = wrapper.firstElementChild;
 
-    this._bindEvents();
+    this._bindElementEvents();
+
+    if (!this._globalBound) {
+      this._globalBound = true;
+      document.addEventListener('langchange', this._onLangChange);
+      window.addEventListener('scroll', this._onScroll, { passive: true });
+    }
+
     return this._el;
   }
 
-  // ── Event binding ────────────────────────────────────────────────────────
-  _bindEvents() {
+  // ── Element-level Event Binding ──────────────────────────────────────────
+  _bindElementEvents() {
     const el = this._el;
+    if (!el) return;
 
-    // Language toggle
+    // Language toggle: i18n.toggle() dispatches 'langchange', which triggers this._onLangChange once
     const toggleBtn = el.querySelector('#lang-toggle-btn');
     if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         i18n.toggle();
-        this._refresh();
       });
     }
 
-    // Scroll shadow effect
-    window.addEventListener('scroll', () => {
-      el.classList.toggle('header--scrolled', window.scrollY > 10);
-    }, { passive: true });
-
-    // Listen for external language changes (e.g. other components)
-    document.addEventListener('langchange', () => this._refresh());
-
     // Mobile menu toggle
     const hamburger = el.querySelector('#btn-hamburger');
-    const nav = el.querySelector('#main-nav');
+    const nav       = el.querySelector('#main-nav');
     if (hamburger && nav) {
       hamburger.addEventListener('click', () => {
         const isOpen = nav.classList.toggle('is-open');
-        hamburger.setAttribute('aria-expanded', isOpen);
+        hamburger.setAttribute('aria-expanded', String(isOpen));
       });
-      
+
       // Close menu on link click
       nav.addEventListener('click', (e) => {
-        if (e.target.tagName === 'A') {
+        if (e.target.closest('a')) {
           nav.classList.remove('is-open');
           hamburger.setAttribute('aria-expanded', 'false');
         }
@@ -248,22 +314,26 @@ class Header {
 
   // ── Refresh after language change ────────────────────────────────────────
   _refresh() {
-    if (!this._el) return;
+    if (!this._el || !this._el.parentNode) return;
 
     const parent   = this._el.parentNode;
     const next     = document.createElement('div');
-    next.innerHTML  = this._buildHTML().trim();
-    const newEl     = next.firstElementChild;
+    next.innerHTML = this._buildHTML().trim();
+    const newEl    = next.firstElementChild;
+
+    if (window.scrollY > 10) {
+      newEl.classList.add('header--scrolled');
+    }
 
     parent.replaceChild(newEl, this._el);
     this._el = newEl;
-    this._bindEvents();
+    this._bindElementEvents();
   }
 
   // ── Update cart / wishlist count ─────────────────────────────────────────
   updateCounts({ cartCount, wishlistCount } = {}) {
-    if (cartCount      !== undefined) this.cartCount      = cartCount;
-    if (wishlistCount  !== undefined) this.wishlistCount  = wishlistCount;
+    if (cartCount     !== undefined) this.cartCount     = cartCount;
+    if (wishlistCount !== undefined) this.wishlistCount = wishlistCount;
     this._refresh();
   }
 }

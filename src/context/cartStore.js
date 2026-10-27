@@ -11,10 +11,11 @@
  */
 
 import { effectivePrice } from '../services/productService.js';
+import products from '../data/products.data.js';
 
 const STORAGE_KEY          = 'beauty-store:cart';
 const FREE_SHIPPING_THRESH = 500;   // MAD
-const SHIPPING_COST        = 39;    // MAD
+const SHIPPING_COST        = 29;    // MAD
 
 // ── Internal state ─────────────────────────────────────────────────────────
 let _items = _load();
@@ -22,7 +23,17 @@ let _items = _load();
 // ── Persistence ────────────────────────────────────────────────────────────
 function _load() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+    const items = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+    // Enrich missing images from catalog
+    return items.map(item => {
+      if (!item.image && !item.mainImage) {
+        const prod = products.find(p => p.id === item.productId);
+        if (prod) {
+          item.image = prod.images?.main || prod.image || prod.img || prod.imageSrc || null;
+        }
+      }
+      return item;
+    });
   } catch {
     return [];
   }
@@ -55,23 +66,29 @@ const cartStore = {
    * @param {number} [qty=1]
    * @param {Object|null} [variant] - Selected variant (or null)
    */
-  add(product, qty = 1, variant = null) {
+  add(product, qty = 1, variant = null, options = {}) {
     const key = _itemKey(product.id, variant?.id ?? null);
     const existing = _items.find(i => i.key === key);
+    const customPrice = typeof options.price === 'number' ? options.price : null;
 
     if (existing) {
       existing.qty = Math.min(existing.qty + qty, 99);
+      if (customPrice !== null) {
+        existing.price = customPrice;
+      }
     } else {
       _items.push({
         key,
-        productId:   product.id,
-        variantId:   variant?.id   ?? null,
-        name:        product.name,          // { fr, ar }
-        brand:       product.brand,
-        emoji:       product.images?.emoji ?? '🧴',
-        price:       effectivePrice(product),
-        regularPrice:product.price.regular,
-        variantLabel:variant?.label ?? null,
+        productId:    product.id,
+        variantId:    variant?.id   ?? null,
+        name:         product.name,          // { fr, ar }
+        brand:        product.brand,
+        emoji:        product.images?.emoji ?? '🧴',
+        image:        product.images?.main || product.image || product.img || product.imageSrc || null,
+        mainImage:    product.images?.main ?? null,
+        price:        customPrice !== null ? customPrice : effectivePrice(product),
+        regularPrice: product.price.regular,
+        variantLabel: variant?.label ?? null,
         qty,
       });
     }

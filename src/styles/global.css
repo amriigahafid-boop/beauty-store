@@ -2,7 +2,6 @@
    GLOBAL BASE STYLES — Beauty Store
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Noto+Sans+Arabic:wght@300..700&display=swap');
 @import './variables.css';
 
 /* ---- Reset ---- */
@@ -32,10 +31,10 @@ html, body {
    LTR DEFAULT (French)
    ============================================================ */
 body {
-  font-family: var(--font-sans);
-  font-size: var(--fs-base);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px; /* updated for readability */
   font-weight: var(--fw-regular);
-  line-height: var(--lh-normal);
+  line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-bg);
   direction: ltr;
@@ -53,15 +52,11 @@ body {
 [dir="rtl"] body,
 body[dir="rtl"],
 html[dir="rtl"] body {
-  font-family: var(--font-arabic);
+  font-family: 'Readex Pro', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px;
   direction: rtl;
   text-align: right;
-  line-height: var(--lh-relaxed); /* Arabic glyphs breathe better */
-}
-
-/* Flip logical-property shorthands that browsers don't auto-mirror */
-[dir="rtl"] .header__nav {
-  flex-direction: row-reverse;
+  line-height: 1.6;
 }
 
 /* ============================================================

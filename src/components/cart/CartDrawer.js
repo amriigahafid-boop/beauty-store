@@ -1,14 +1,19 @@
 /**
  * CartDrawer.js — Slide-in Cart Drawer Component
- * Beauty Store — src/components/cart/CartDrawer.js
+ * Lumière Beauty Store — src/components/cart/CartDrawer.js
+ *
+ * Strictly bound to active locale (`src/context/locales/`) and localized
+ * product fields. Listens to `langchange` and `cartchange`.
  */
 
-import cartStore from '../../context/cartStore.js';
-import i18n      from '../../context/i18n.js';
+import cartStore       from '../../context/cartStore.js';
+import i18n            from '../../context/i18n.js';
+import products        from '../../data/products.data.js';
 import { formatPrice } from '../../utils/currency.js';
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 const Icons = {
+  bag:    `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
   close:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
   trash:  `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`,
   arrow:  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
@@ -18,9 +23,9 @@ const Icons = {
 
 class CartDrawer {
   constructor() {
-    this._el       = null;
-    this._overlay  = null;
-    this._isOpen   = false;
+    this._el      = null;
+    this._overlay = null;
+    this._isOpen  = false;
 
     // Bind handlers once
     this._onCartChange = () => this._refresh();
@@ -28,7 +33,7 @@ class CartDrawer {
   }
 
   // ── Mount ─────────────────────────────────────────────────────────────────
-  mount(container) {
+  mount() {
     // Overlay
     this._overlay = document.createElement('div');
     this._overlay.className = 'overlay';
@@ -67,7 +72,6 @@ class CartDrawer {
     this._overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     this._el.setAttribute('aria-hidden', 'false');
-    // Focus trap: focus first focusable element
     setTimeout(() => {
       const first = this._el.querySelector('button, a, input');
       if (first) first.focus();
@@ -86,19 +90,26 @@ class CartDrawer {
 
   // ── Internal render ───────────────────────────────────────────────────────
   _render() {
+    if (!this._el) return;
     const lang    = i18n.lang;
+    const isAr    = lang === 'ar';
     const summary = cartStore.summary();
     const { items, count, subtotal, shipping, total, freeShipping, remaining } = summary;
+
+    this._el.setAttribute('aria-label', i18n.t('cart.title'));
+
+    const remainingFormatted = formatPrice(remaining, lang);
+    const shippingHintText   = i18n.t('cart.addForFreeShipping', { amount: remainingFormatted });
 
     this._el.innerHTML = `
       <!-- Header -->
       <div class="cart-drawer__header">
         <div class="cart-drawer__title">
-          <span class="cart-drawer__title-icon">🛒</span>
+          <span class="cart-drawer__title-icon" aria-hidden="true">${Icons.bag}</span>
           <span data-i18n="cart.title">${i18n.t('cart.title')}</span>
           <span class="cart-drawer__count">${count}</span>
         </div>
-        <button class="cart-drawer__close" id="cart-close-btn" aria-label="${i18n.t('ui.close')}">
+        <button type="button" class="cart-drawer__close" id="cart-close-btn" aria-label="${i18n.t('ui.close')}">
           ${Icons.close}
         </button>
       </div>
@@ -108,8 +119,8 @@ class CartDrawer {
         <div class="cart-shipping-bar">
           <div class="cart-shipping-bar__text">
             ${freeShipping
-              ? `<span>🎉 <strong>${i18n.t('cart.freeShipping')}</strong></span><span>✓</span>`
-              : `<span>${lang === 'ar' ? 'أضيفي' : 'Ajoutez'} <strong>${formatPrice(remaining, lang)}</strong> ${lang === 'ar' ? 'للشحن المجاني' : 'pour la livraison offerte'}</span>
+              ? `<span>✦ <strong data-i18n="cart.freeShipping">${i18n.t('cart.freeShipping')}</strong></span><span>✓</span>`
+              : `<span>${shippingHintText}</span>
                  <span>${Math.round((subtotal / cartStore.FREE_SHIPPING_THRESH) * 100)}%</span>`
             }
           </div>
@@ -147,17 +158,18 @@ class CartDrawer {
           </div>
 
           <a href="checkout.html" class="cart-checkout-btn" id="cart-checkout-btn">
-            <span>${i18n.t('cart.checkout')}</span>
+            <span data-i18n="cart.checkout">${i18n.t('cart.checkout')}</span>
             ${Icons.arrow}
           </a>
 
-          <button class="cart-continue-btn" id="cart-continue-btn">
-            ← ${i18n.t('cart.continueShopping')}
+          <button type="button" class="cart-continue-btn" id="cart-continue-btn">
+            <span>${isAr ? '→' : '←'}</span>
+            <span data-i18n="cart.continueShopping">${i18n.t('cart.continueShopping')}</span>
           </button>
 
           <div class="cart-security">
-            <span>${Icons.lock} ${lang === 'ar' ? 'دفع آمن' : 'Paiement sécurisé'}</span>
-            <span>${Icons.truck} ${lang === 'ar' ? 'تتبع الطلب' : 'Suivi de commande'}</span>
+            <span>${Icons.lock} <span data-i18n="cart.securePayment">${i18n.t('cart.securePayment')}</span></span>
+            <span>${Icons.truck} <span data-i18n="cart.orderTracking">${i18n.t('cart.orderTracking')}</span></span>
           </div>
         </div>
       ` : ''}
@@ -167,38 +179,54 @@ class CartDrawer {
   }
 
   _renderEmpty() {
-    const lang = i18n.lang;
     return `
       <div class="cart-empty">
-        <div class="cart-empty__icon">🛍️</div>
+        <div class="cart-empty__icon" aria-hidden="true">${Icons.bag}</div>
         <div class="cart-empty__title" data-i18n="cart.empty">${i18n.t('cart.empty')}</div>
         <div class="cart-empty__hint" data-i18n="cart.emptyHint">${i18n.t('cart.emptyHint')}</div>
-        <button class="cart-empty__cta" id="cart-continue-empty">
-          ${lang === 'ar' ? 'تصفحي المنتجات ✨' : 'Découvrir nos produits ✨'}
+        <button type="button" class="cart-empty__cta" id="cart-continue-empty" data-i18n="cart.discoverProducts">
+          ${i18n.t('cart.discoverProducts')}
         </button>
       </div>
     `;
   }
 
   _renderItem(item, lang) {
-    const name = item.name?.[lang] ?? item.name?.fr ?? '';
+    const catalogProd = products.find(p => p.id === item.productId);
+    const title =
+      catalogProd?.title?.[lang] ??
+      catalogProd?.name?.[lang] ??
+      item.title?.[lang] ??
+      item.name?.[lang] ??
+      item.title?.fr ??
+      item.name?.fr ??
+      '';
+    const removeLabel = i18n.t('cart.remove');
+
     return `
       <div class="cart-item" data-key="${item.key}">
-        <div class="cart-item__image">${item.emoji}</div>
+        ${(item.image || item.mainImage)
+          ? `<img src="${item.image || item.mainImage}" alt="${title}" class="cart-item__image" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+          : `<div class="cart-item__image">${item.emoji}</div>`}
         <div class="cart-item__details">
           <div class="cart-item__brand">${item.brand}</div>
-          <div class="cart-item__name" title="${name}">${name}</div>
+          <div class="cart-item__name" title="${title}">${title}</div>
           ${item.variantLabel ? `<div class="cart-item__variant">${item.variantLabel}</div>` : ''}
           <div class="cart-item__bottom">
             <div class="qty-stepper" data-key="${item.key}">
-              <button class="qty-stepper__btn" data-action="dec" ${item.qty <= 1 ? 'title="Remove"' : ''}>
+              <button type="button" class="qty-stepper__btn" data-action="dec" ${item.qty <= 1 ? `title="${removeLabel}" aria-label="${removeLabel}"` : ''}>
                 ${item.qty <= 1 ? Icons.trash : '−'}
               </button>
               <span class="qty-stepper__value">${item.qty}</span>
-              <button class="qty-stepper__btn" data-action="inc">+</button>
+              <button type="button" class="qty-stepper__btn" data-action="inc">+</button>
             </div>
-            <div class="cart-item__price">${formatPrice(item.price * item.qty, lang)}</div>
-            <button class="cart-item__remove" data-key="${item.key}" title="${i18n.t('cart.remove')}">
+            <div class="cart-item__price">
+              ${item.regularPrice && item.regularPrice > item.price
+                ? `<span class="cart-item__price-old" style="font-size:0.74rem;color:var(--color-text-muted);text-decoration:line-through;margin-inline-end:6px;font-weight:500;">${formatPrice(item.regularPrice * item.qty, lang)}</span>`
+                : ''
+              }<span style="${item.regularPrice && item.regularPrice > item.price ? 'color:#9D3B5C;' : ''}">${formatPrice(item.price * item.qty, lang)}</span>
+            </div>
+            <button type="button" class="cart-item__remove" data-key="${item.key}" title="${removeLabel}" aria-label="${removeLabel}">
               ${Icons.trash}
             </button>
           </div>
@@ -255,7 +283,7 @@ class CartDrawer {
 }
 
 // ── Toast helper (shared) ──────────────────────────────────────────────────
-export function showToast(message, { type = 'info', icon = '✨', duration = 3000 } = {}) {
+export function showToast(message, { type = 'info', icon = '✦', duration = 3000 } = {}) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
@@ -264,7 +292,6 @@ export function showToast(message, { type = 'info', icon = '✨', duration = 300
   toast.innerHTML = `<span class="toast__icon">${icon}</span><span class="toast__text">${message}</span>`;
   container.appendChild(toast);
 
-  // Trigger animation
   requestAnimationFrame(() => {
     requestAnimationFrame(() => toast.classList.add('show'));
   });

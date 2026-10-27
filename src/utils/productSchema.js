@@ -4,29 +4,9 @@
  *
  * Defines the canonical shape of a product object and provides
  * a validated factory function so every product in the catalogue
- * is guaranteed to have every field the UI expects.
- *
- * ┌───────────────────────────────────────────────────────────┐
- * │  PRODUCT SHAPE                                             │
- * │                                                            │
- * │  id            string   Unique slug  e.g. "serum-rose-01" │
- * │  sku           string   Stock-keeping unit                 │
- * │  name          object   { fr, ar }  Localised names       │
- * │  tagline       object   { fr, ar }  Short marketing line  │
- * │  description   object   { fr, ar }  Long description      │
- * │  category      string   slug  e.g. "skincare"             │
- * │  subcategory   string   slug  e.g. "serums"               │
- * │  brand         string   Brand name                        │
- * │  images        object   { main, gallery[], alt }          │
- * │  price         object   { regular, sale?, currency }      │
- * │  stock         object   { qty, status }                   │
- * │  rating        object   { average, count }                │
- * │  tags          string[]                                    │
- * │  badges        string[]  e.g. ["new","bestseller"]        │
- * │  ingredients   string[]  Key active ingredients           │
- * │  variants      Variant[] Shade / size / volume options    │
- * │  meta          object   { createdAt, updatedAt }          │
- * └───────────────────────────────────────────────────────────┘
+ * is guaranteed to have every field the UI expects, including
+ * full bilingual support (`fr` / `ar`) for `title`/`name`,
+ * `snippet`/`tagline`, `description`, and `ingredients`.
  */
 
 import { CURRENCY_CODE } from './currency.js';
@@ -56,6 +36,7 @@ export const CATEGORIES = Object.freeze({
   MAKEUP:   'makeup',
   PERFUMES: 'perfumes',
   HAIRCARE: 'haircare',
+  HAIR:     'hair',
   BODY:     'body',
   TOOLS:    'tools',
 });
@@ -63,18 +44,8 @@ export const CATEGORIES = Object.freeze({
 // ── Variant factory ────────────────────────────────────────────────────────
 
 /**
- * @typedef {Object} ProductVariant
- * @property {string}  id         - Unique variant id, e.g. "shade-01"
- * @property {string}  label      - Display label, e.g. "Rose Naturel"
- * @property {string}  [color]    - CSS hex/hsl for swatch rendering
- * @property {string}  [size]     - e.g. "30ml"
- * @property {number}  [price]    - Override price; falls back to product price
- * @property {boolean} [available]
- */
-
-/**
- * @param {Partial<ProductVariant>} data
- * @returns {ProductVariant}
+ * @param {Partial<Object>} data
+ * @returns {Object}
  */
 export function createVariant(data = {}) {
   return {
@@ -87,47 +58,46 @@ export function createVariant(data = {}) {
   };
 }
 
+/**
+ * Normalise ingredients so it works both as an Array (`product.ingredients.map(...)`)
+ * and as a localized lookup (`product.ingredients[lang]`).
+ */
+function normaliseIngredients(raw) {
+  let frList = [];
+  let arList = [];
+
+  if (Array.isArray(raw)) {
+    frList = [...raw];
+    arList = [...raw];
+  } else if (raw && typeof raw === 'object') {
+    frList = Array.isArray(raw.fr) ? [...raw.fr] : [];
+    arList = Array.isArray(raw.ar) ? [...raw.ar] : [...frList];
+  }
+
+  const hybrid = [...frList];
+  Object.defineProperty(hybrid, 'fr', { value: frList, enumerable: false });
+  Object.defineProperty(hybrid, 'ar', { value: arList, enumerable: false });
+  return hybrid;
+}
+
 // ── Product factory ────────────────────────────────────────────────────────
 
 /**
- * @typedef {Object} LocalisedString
- * @property {string} fr
- * @property {string} ar
- */
-
-/**
- * @typedef {Object} Product
- * @property {string}          id
- * @property {string}          sku
- * @property {LocalisedString} name
- * @property {LocalisedString} tagline
- * @property {LocalisedString} description
- * @property {string}          category
- * @property {string}          subcategory
- * @property {string}          brand
- * @property {{ main: string, gallery: string[], alt: LocalisedString }} images
- * @property {{ regular: number, sale: number|null, currency: string }} price
- * @property {{ qty: number, status: string }} stock
- * @property {{ average: number, count: number }} rating
- * @property {string[]}        tags
- * @property {string[]}        badges
- * @property {string[]}        ingredients
- * @property {ProductVariant[]} variants
- * @property {{ createdAt: string, updatedAt: string }} meta
- */
-
-/**
  * Validate and normalise a raw product object.
- * Throws if required fields are missing or malformed.
+ * Guarantees both `title[lang]`/`name[lang]`, `snippet[lang]`/`tagline[lang]`,
+ * and `description[lang]` are present for `'fr'` and `'ar'`.
  *
- * @param {Partial<Product>} data
- * @returns {Product}
+ * @param {Partial<Object>} data
+ * @returns {Object}
  */
 export function createProduct(data = {}) {
+  const frName = data.title?.fr ?? data.name?.fr;
+  const arName = data.title?.ar ?? data.name?.ar;
+
   // ── Required field guards ──────────────────────────────────────────────
-  if (!data.id)              throw new Error('[Product] "id" is required');
-  if (!data.name?.fr)        throw new Error(`[Product:${data.id}] "name.fr" is required`);
-  if (!data.name?.ar)        throw new Error(`[Product:${data.id}] "name.ar" is required`);
+  if (!data.id)       throw new Error('[Product] "id" is required');
+  if (!frName)        throw new Error(`[Product:${data.id}] "name.fr" / "title.fr" is required`);
+  if (!arName)        throw new Error(`[Product:${data.id}] "name.ar" / "title.ar" is required`);
   if (typeof data.price?.regular !== 'number')
     throw new Error(`[Product:${data.id}] "price.regular" must be a number`);
 
@@ -142,15 +112,34 @@ export function createProduct(data = {}) {
 
   const now = new Date().toISOString();
 
+  const titleObj = {
+    fr: frName,
+    ar: arName,
+  };
+
+  const snippetObj = {
+    fr: data.snippet?.fr ?? data.tagline?.fr ?? '',
+    ar: data.snippet?.ar ?? data.tagline?.ar ?? '',
+  };
+
+  const descriptionObj = {
+    fr: data.description?.fr ?? '',
+    ar: data.description?.ar ?? '',
+  };
+
+  const ingredients = normaliseIngredients(data.ingredients);
+
   return {
     // Identity
     id:          data.id,
     sku:         data.sku         ?? data.id.toUpperCase().replace(/-/g, '_'),
 
-    // Localised content
-    name:        { fr: data.name.fr,        ar: data.name.ar        },
-    tagline:     { fr: data.tagline?.fr ?? '', ar: data.tagline?.ar ?? '' },
-    description: { fr: data.description?.fr ?? '', ar: data.description?.ar ?? '' },
+    // Localised content (supports both title/snippet and name/tagline)
+    title:       titleObj,
+    name:        titleObj,
+    snippet:     snippetObj,
+    tagline:     snippetObj,
+    description: descriptionObj,
 
     // Taxonomy
     category:    data.category    ?? CATEGORIES.SKINCARE,
@@ -161,9 +150,10 @@ export function createProduct(data = {}) {
     images: {
       main:    data.images?.main    ?? '',
       gallery: data.images?.gallery ?? [],
+      emoji:   data.images?.emoji   ?? '🧴',
       alt:     {
-        fr: data.images?.alt?.fr ?? data.name.fr,
-        ar: data.images?.alt?.ar ?? data.name.ar,
+        fr: data.images?.alt?.fr ?? frName,
+        ar: data.images?.alt?.ar ?? arName,
       },
     },
 
@@ -189,7 +179,7 @@ export function createProduct(data = {}) {
     // Discovery
     tags:        data.tags        ?? [],
     badges:      data.badges      ?? [],
-    ingredients: data.ingredients ?? [],
+    ingredients,
 
     // Variants (shades, sizes, volumes)
     variants: (data.variants ?? []).map(createVariant),

@@ -1,28 +1,30 @@
 /**
  * main.js — Application Entry Point
- * Beauty Store
+ * Lumière Beauty Store — src/main.js
  *
  * Boot order (all inside DOMContentLoaded):
- *  1. i18n.init()        — load persisted language, apply dir/translations
+ *  1. i18n.init()        — load persisted language, apply dir/lang/translations
  *  2. CartDrawer         — mounts overlay + drawer into document.body
  *  3. Header             — replaces #header-root with rendered header
- *  4. HeroSlider         — injects full hero section into #hero-root,
- *                          then creates the three interactive sliders
- *  5. ShopSection        — renders product grid into #shop-root
- *  6. Global listeners   — cart badge, lang fade, Escape key, scroll nav
+ *  4. HeroSlider         — mounts luxury hero carousel into #hero-carousel-root
+ *  5. ShopSection        — renders product grid & guarantees into #shop-root
+ *  6. HomeSections       — renders concerns, brands, bundles, reviews, FAQ
+ *  7. Global listeners   — cart badge, langchange title sync, Escape key, scroll nav
  */
 
-import i18n        from './context/i18n.js';
+import i18n         from './context/i18n.js';
 import cartStore    from './context/cartStore.js';
 import Header       from './components/layout/Header.js';
 import CartDrawer   from './components/cart/CartDrawer.js';
-import HeroCarousel from './components/hero/HeroCarousel.js';
+import HeroSlider   from './components/hero/HeroSlider.js';
 import ShopSection  from './components/product/ShopSection.js';
+import HomeSections from './components/home/HomeSections.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── 1. i18n ────────────────────────────────────────────────────────────────
+  // ── 1. i18n (single source of truth) ───────────────────────────────────────
   i18n.init();
+  document.title = i18n.t('meta.title');
 
   // ── 2. Cart drawer ─────────────────────────────────────────────────────────
   const cartDrawer = new CartDrawer();
@@ -44,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── 4. Hero Carousel ─────────────────────────
-  new HeroCarousel().mount();
+  // ── 4. Hero Slider ─────────────────────────────────────────────────────────
+  new HeroSlider({ cartDrawer }).mount('#hero-carousel-root');
 
   // ── 5. Shop section ────────────────────────────────────────────────────────
   const shopRoot = document.getElementById('shop-root');
@@ -53,37 +55,40 @@ document.addEventListener('DOMContentLoaded', () => {
     new ShopSection({ cartDrawer }).mount(shopRoot);
   }
 
-  // ── 6. Global listeners ────────────────────────────────────────────────────
+  // ── 6. Additional Homepage Sections (Concerns, Brands, Bundles, Reviews, FAQ)
+  new HomeSections({ cartDrawer }).mount({
+    topRoot:    '#home-top-sections',
+    bottomRoot: '#home-bottom-sections',
+  });
+
+  // Ensure all [data-i18n] nodes (including Footer) match the active locale
+  i18n.applyTranslations();
+
+  // ── 7. Global listeners ────────────────────────────────────────────────────
 
   // Cart badge update
   document.addEventListener('cartchange', ({ detail }) => {
     const badge = document.querySelector('#btn-cart .header__badge');
     if (badge) {
-      badge.textContent    = detail.count;
-      badge.style.display  = detail.count > 0 ? 'flex' : 'none';
+      badge.textContent   = detail.count;
+      badge.style.display = detail.count > 0 ? 'flex' : 'none';
+      badge.setAttribute('aria-label', i18n.t('actions.itemsCount', { count: detail.count }));
     } else if (detail.count > 0) {
       const btn = document.getElementById('btn-cart');
       if (btn && !btn.querySelector('.header__badge')) {
         const b = document.createElement('span');
         b.className = 'header__badge';
-        b.setAttribute('aria-label', `${detail.count} articles`);
+        b.setAttribute('aria-label', i18n.t('actions.itemsCount', { count: detail.count }));
         b.textContent = detail.count;
         btn.appendChild(b);
       }
     }
   });
 
-  // Language change → page title + cross-fade
-  document.addEventListener('langchange', ({ detail }) => {
-    document.title = detail.lang === 'ar'
-      ? 'لوميير — الجمال الفاخر'
-      : 'Lumière — Beauté & Cosmétiques Premium';
-
-    document.body.style.opacity   = '0';
-    document.body.style.transition = 'opacity 200ms ease';
-    requestAnimationFrame(() => {
-      setTimeout(() => { document.body.style.opacity = '1'; }, 60);
-    });
+  // Language change → update document title & re-observe sections
+  document.addEventListener('langchange', () => {
+    document.title = i18n.t('meta.title');
+    document.querySelectorAll('section[id]').forEach(s => sectionObserver.observe(s));
   });
 
   // Logo → scroll to top
@@ -91,6 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.closest('.header__logo')) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Category and section links (#hair, #body, #shop, #brands, #sale) → switch tab or scroll
+    const link = e.target.closest('a[href^="#"]');
+    if (link) {
+      const cat    = link.getAttribute('href').slice(1);
+      const tabBtn = document.querySelector(`.filter-tab[data-filter="${cat}"]`);
+      if (tabBtn) {
+        e.preventDefault();
+        tabBtn.click();
+        document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' });
+      } else if (cat) {
+        const targetEl = document.getElementById(cat);
+        if (targetEl) {
+          e.preventDefault();
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
   });
 
@@ -111,9 +135,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { rootMargin: '-30% 0px -60% 0px' });
 
   document.querySelectorAll('section[id]').forEach(s => sectionObserver.observe(s));
-  // Re-observe after hero is injected (hero section is created after DOMContentLoaded)
-  document.addEventListener('langchange', () => {
-    document.querySelectorAll('section[id]').forEach(s => sectionObserver.observe(s));
-  });
 
 });

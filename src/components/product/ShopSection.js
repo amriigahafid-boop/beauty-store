@@ -1,92 +1,85 @@
 /**
- * ShopSection.js — Product Grid + Filter Tabs Component
- * Beauty Store — src/components/product/ShopSection.js
+ * ShopSection.js — Product Grid + Filter Tabs + Guarantees Component
+ * Lumière Beauty Store — src/components/product/ShopSection.js
+ *
+ * Strictly bound to active locale (`src/context/locales/`) and localized
+ * product fields (`title[lang]`, `snippet[lang]`, `description[lang]`).
+ * Listens to `langchange` and re-renders all items cleanly in the selected language.
  */
 
-import products            from '../../data/products.data.js';
-import cartStore           from '../../context/cartStore.js';
-import i18n                from '../../context/i18n.js';
-import { formatPrice, applyDiscount } from '../../utils/currency.js';
-import { effectivePrice, discountPercent } from '../../services/productService.js';
-import { showToast }       from '../cart/CartDrawer.js';
+import products                             from '../../data/products.data.js';
+import cartStore                            from '../../context/cartStore.js';
+import i18n                                 from '../../context/i18n.js';
+import { formatPrice }                      from '../../utils/currency.js';
+import { effectivePrice, discountPercent }  from '../../services/productService.js';
+import { showToast }                        from '../cart/CartDrawer.js';
 
-// Map product category → emoji
-const CAT_EMOJI = {
-  skincare: '🌿', makeup: '💄', perfumes: '🌸', haircare: '✨', body: '🫧', tools: '💎',
-};
-
-// Map product id → display emoji (richer than a single category icon)
-const PRODUCT_EMOJI = {
-  'serum-eclat-rose':          '🧴',
-  'creme-perfectrice-argan':   '🫙',
-  'masque-argile-rose':        '🌹',
-  'spf50-fluide-protecteur':   '☀️',
-  'fond-teint-velours':        '💅',
-  'rouge-levres-satin-rose':   '💋',
-  'palette-yeux-sables-dores': '🎨',
-  'parfum-rose-orient':        '🌹',
-  'parfum-ambre-musk':         '🪷',
-  'masque-cheveux-argan-keratin':'💆',
-  'huile-cheveux-5-huiles':    '🌺',
-  'gel-douche-fleur-oranger':  '🍊',
-  'beurre-corps-rose-henne':   '🌸',
-  'pinceau-kabuki-pro':        '🖌️',
-  'galet-massage-gua-sha-rose':'💎',
-  'roll-on-jade-facial':       '🪩',
-};
-
-// Enrich products with emoji for display
-products.forEach(p => {
-  p.images = p.images ?? {};
-  p.images.emoji = PRODUCT_EMOJI[p.id] ?? CAT_EMOJI[p.category] ?? '🧴';
-});
-
-// Category filter config
+// Category filter config with minimalist SVG icons
 const FILTERS = [
-  { key: 'all',      icon: '✨' },
-  { key: 'skincare', icon: '🌿' },
-  { key: 'makeup',   icon: '💄' },
-  { key: 'perfumes', icon: '🌸' },
-  { key: 'haircare', icon: '✨' },
-  { key: 'body',     icon: '🫧' },
-  { key: 'tools',    icon: '💎' },
+  {
+    key: 'all',
+    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>`,
+  },
+  {
+    key: 'hair',
+    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>`,
+  },
+  {
+    key: 'body',
+    icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>`,
+  },
 ];
 
+const HEART_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+const HEART_FILLED_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#9D3B5C" stroke="#9D3B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+
 class ShopSection {
-  constructor({ cartDrawer }) {
+  constructor({ cartDrawer } = {}) {
     this._cartDrawer   = cartDrawer;
     this._activeFilter = 'all';
+    this._activeBrand  = null;
     this._wishlist     = new Set(JSON.parse(localStorage.getItem('beauty-store:wishlist') ?? '[]'));
     this._el           = null;
+    this._obs          = null;
 
-    document.addEventListener('langchange', () => this._refresh());
+    this._onLangChange = () => this._refresh(true);
+    this._onBrandFilter = ({ detail }) => {
+      if (detail?.brand) {
+        this._activeBrand  = detail.brand;
+        this._activeFilter = 'all';
+        this._refresh(true);
+      }
+    };
+
+    document.addEventListener('langchange', this._onLangChange);
+    document.addEventListener('brandfilter', this._onBrandFilter);
   }
 
   // ── Mount ──────────────────────────────────────────────────────────────
   mount(container) {
-    this._el = container;
-    this._render();
+    this._el = typeof container === 'string' ? document.querySelector(container) : container;
+    if (!this._el) return this;
+    this._render(false);
     this._initIntersectionObserver();
     return this;
   }
 
   // ── Render ─────────────────────────────────────────────────────────────
-  _render() {
-    const lang = i18n.lang;
+  _render(immediateVisible = false) {
+    if (!this._el) return;
+    const lang     = i18n.lang;
     const filtered = this._getFiltered();
 
     this._el.innerHTML = `
-      <section class="shop-section" id="shop" aria-label="${lang === 'ar' ? 'المتجر' : 'Boutique'}">
+      <section class="shop-section" id="shop" aria-label="${i18n.t('nav.shop')}">
         <div class="container">
 
           <!-- Section header -->
           <div class="section-header">
             <span class="section-header__eyebrow" data-i18n="categories.title">${i18n.t('categories.title')}</span>
             <h2 class="section-header__title" data-i18n="categories.subtitle">${i18n.t('categories.subtitle')}</h2>
-            <p class="section-header__subtitle">
-              ${lang === 'ar'
-                ? 'مجموعة مختارة بعناية من أفضل منتجات التجميل بسعر الدرهم المغربي'
-                : 'Une sélection soignée de produits de beauté premium, tous en Dirhams marocains'}
+            <p class="section-header__subtitle" data-i18n="categories.description">
+              ${i18n.t('categories.description')}
             </p>
           </div>
 
@@ -94,75 +87,100 @@ class ShopSection {
           <div class="filter-tabs" id="filter-tabs" role="tablist">
             ${FILTERS.map(f => {
               const count = f.key === 'all' ? products.length : products.filter(p => p.category === f.key).length;
-              const label = f.key === 'all'
-                ? (lang === 'ar' ? 'الكل' : 'Tout')
-                : i18n.t(`categoryLabels.${f.key}`);
+              const labelKey = `categoryLabels.${f.key}`;
+              const label    = i18n.t(labelKey);
+              const isActive = this._activeFilter === f.key && !this._activeBrand;
               return `
                 <button
-                  class="filter-tab ${this._activeFilter === f.key ? 'active' : ''}"
+                  type="button"
+                  class="filter-tab ${isActive ? 'active' : ''}"
                   data-filter="${f.key}"
                   role="tab"
-                  aria-selected="${this._activeFilter === f.key}"
+                  aria-selected="${isActive}"
                 >
                   <span class="filter-tab__icon">${f.icon}</span>
-                  ${label}
+                  <span data-i18n="${labelKey}">${label}</span>
                   <span class="filter-tab__count">${count}</span>
                 </button>
               `;
             }).join('')}
           </div>
 
+          ${this._activeBrand ? `
+            <div class="shop-brand-banner">
+              <span class="shop-brand-banner__pill">
+                <span><span data-i18n="categories.brandFilterLabel">${i18n.t('categories.brandFilterLabel')}</span> <strong>${this._activeBrand}</strong></span>
+                <button type="button" class="shop-brand-banner__clear" id="btn-clear-brand" aria-label="${i18n.t('categories.clearBrandFilter')}">✕</button>
+              </span>
+            </div>
+          ` : ''}
+
           <!-- Product grid -->
           <div class="product-grid" id="product-grid">
-            ${filtered.map(p => this._renderCard(p, lang)).join('')}
+            ${filtered.map(p => this._renderCard(p, lang, immediateVisible)).join('')}
           </div>
 
-          <!-- Footer -->
-          <div class="shop-section__footer">
-            <a href="#shop" class="btn--outline">
-              ${lang === 'ar' ? 'عرض كل المنتجات' : 'Voir tous les produits'} →
-            </a>
-          </div>
         </div>
       </section>
 
-      <!-- Trust strip -->
-      <div class="trust-strip">
+      <!-- Luxury 4-Pillar Service & Guarantee Strip -->
+      <section class="lux-guarantees" aria-label="${i18n.t('guarantees.sectionLabel')}">
         <div class="container">
-          <div class="trust-strip__inner">
-            <div class="trust-item">
-              <div class="trust-item__icon">🚚</div>
-              <div class="trust-item__text">
-                <div class="trust-item__title">${lang === 'ar' ? 'توصيل مجاني' : 'Livraison offerte'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'ابتداءً من 399 درهم من المشتريات' : 'Dès 399 DH d\'achat'}</div>
+          <div class="lux-guarantees__grid">
+
+            <div class="lux-guarantee-card">
+              <div class="lux-guarantee-card__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+              </div>
+              <div class="lux-guarantee-card__body">
+                <h3 class="lux-guarantee-card__title" data-i18n="guarantees.authentic.title">${i18n.t('guarantees.authentic.title')}</h3>
+                <p class="lux-guarantee-card__desc" data-i18n="guarantees.authentic.desc">${i18n.t('guarantees.authentic.desc')}</p>
               </div>
             </div>
-            <div class="trust-item">
-              <div class="trust-item__icon">💵</div>
-              <div class="trust-item__text">
-                <div class="trust-item__title">${lang === 'ar' ? 'الدفع عند الاستلام' : 'Paiement à la livraison'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'ادفع بكل أمان عند استلام طلبك' : 'Payez en toute confiance à la réception'}</div>
+
+            <div class="lux-guarantee-card">
+              <div class="lux-guarantee-card__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              </div>
+              <div class="lux-guarantee-card__body">
+                <h3 class="lux-guarantee-card__title" data-i18n="guarantees.shipping.title">${i18n.t('guarantees.shipping.title')}</h3>
+                <p class="lux-guarantee-card__desc" data-i18n="guarantees.shipping.desc">${i18n.t('guarantees.shipping.desc')}</p>
               </div>
             </div>
-            <div class="trust-item">
-              <div class="trust-item__icon">↩️</div>
-              <div class="trust-item__text">
-                <div class="trust-item__title">${lang === 'ar' ? 'إرجاع سهل' : 'Retours faciles'}</div>
-                <div class="trust-item__desc">${lang === 'ar' ? 'إذا كان المنتج غير مفتوح وغير مستعمل' : 'Produit non ouvert & non utilisé'}</div>
+
+            <div class="lux-guarantee-card">
+              <div class="lux-guarantee-card__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+              </div>
+              <div class="lux-guarantee-card__body">
+                <h3 class="lux-guarantee-card__title" data-i18n="guarantees.cod.title">${i18n.t('guarantees.cod.title')}</h3>
+                <p class="lux-guarantee-card__desc" data-i18n="guarantees.cod.desc">${i18n.t('guarantees.cod.desc')}</p>
               </div>
             </div>
+
+            <div class="lux-guarantee-card">
+              <div class="lux-guarantee-card__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <div class="lux-guarantee-card__body">
+                <h3 class="lux-guarantee-card__title" data-i18n="guarantees.advisor.title">${i18n.t('guarantees.advisor.title')}</h3>
+                <p class="lux-guarantee-card__desc" data-i18n="guarantees.advisor.desc">${i18n.t('guarantees.advisor.desc')}</p>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
+      </section>
     `;
 
     this._bindTabEvents();
     this._bindCardEvents();
   }
 
-  _renderCard(product, lang) {
-    const name      = product.name?.[lang] ?? product.name?.fr ?? '';
-    const tagline   = product.tagline?.[lang] ?? product.tagline?.fr ?? '';
+  _renderCard(product, lang, immediateVisible = false) {
+    const title     = product.title?.[lang]       ?? product.name?.[lang]    ?? product.title?.fr   ?? product.name?.fr    ?? '';
+    const snippet   = product.snippet?.[lang]     ?? product.tagline?.[lang] ?? product.snippet?.fr ?? product.tagline?.fr ?? '';
+    const desc      = product.description?.[lang] ?? product.description?.fr ?? '';
     const price     = effectivePrice(product);
     const regular   = product.price.regular;
     const onSale    = product.price.sale !== null;
@@ -170,48 +188,55 @@ class ShopSection {
     const isOOS     = product.stock.status === 'out_of_stock';
     const isWished  = this._wishlist.has(product.id);
     const emoji     = product.images?.emoji ?? '🧴';
+    const stars     = this._renderStars(product.rating.average);
 
-    // Render stars
-    const stars = this._renderStars(product.rating.average);
-
-    // Build badges (max 2)
-    const badgeMap = {
-      new:        `<span class="badge badge--new">${i18n.t('product.new')}</span>`,
-      bestseller: `<span class="badge badge--bestseller">${i18n.t('product.bestseller')}</span>`,
-      sale:       `<span class="badge badge--sale">${i18n.t('product.sale')}</span>`,
-      limited:    `<span class="badge badge--limited">${i18n.t('product.limited')}</span>`,
-      exclusive:  `<span class="badge badge--exclusive">${i18n.t('product.exclusive')}</span>`,
-      vegan:      `<span class="badge badge--vegan">${i18n.t('product.vegan')}</span>`,
-      natural:    `<span class="badge badge--natural">${i18n.t('product.natural')}</span>`,
-    };
-    const badges = product.badges.slice(0, 2).map(b => badgeMap[b] ?? '').join('');
+    const primaryBadge = product.badges?.includes('bestseller')
+      ? 'bestseller'
+      : product.badges?.includes('vegan')
+      ? 'vegan'
+      : product.badges?.[0] || null;
 
     return `
       <article
-        class="product-card"
+        class="product-card${immediateVisible ? ' visible' : ''}"
         data-id="${product.id}"
         data-category="${product.category}"
-        aria-label="${name}"
+        aria-label="${title}"
       >
         <!-- Image -->
         <div class="product-card__image-wrap">
-          <div class="product-card__image">${emoji}</div>
+          ${primaryBadge ? `
+            <div class="product-card__badges">
+              <span class="badge badge--${primaryBadge}" data-i18n="product.${primaryBadge}">${i18n.t(`product.${primaryBadge}`)}</span>
+            </div>
+          ` : ''}
+
+          <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-card__image-link" aria-label="${title}">
+            ${product.images?.main
+              ? `<img src="${product.images.main}" alt="${title}" class="product-card__image" loading="lazy" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+              : `<div class="product-card__image">${emoji}</div>`}
+          </a>
 
           <button
+            type="button"
             class="product-card__wishlist ${isWished ? 'active' : ''}"
             data-id="${product.id}"
             aria-label="${i18n.t('product.addToWishlist')}"
             title="${i18n.t('product.addToWishlist')}"
-          >${isWished ? '❤️' : '🤍'}</button>
+          >${isWished ? HEART_FILLED_SVG : HEART_SVG}</button>
 
-          ${isOOS ? `<div class="product-card__oos-overlay">${i18n.t('product.outOfStock')}</div>` : ''}
+          ${isOOS ? `<div class="product-card__oos-overlay" data-i18n="product.outOfStock">${i18n.t('product.outOfStock')}</div>` : ''}
         </div>
 
         <!-- Body -->
         <div class="product-card__body">
           <div class="product-card__brand">${product.brand}</div>
-          <div class="product-card__name">${name}</div>
-          <div class="product-card__tagline">${tagline}</div>
+          <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-card__name" style="text-decoration:none;color:inherit;display:block;">${title}</a>
+          <div class="product-card__tagline">${snippet}</div>
+          <details class="product-card__quick-view">
+            <summary data-i18n="product.viewDescription">${i18n.t('product.viewDescription')}</summary>
+            <div class="product-card__quick-view-content">${desc}</div>
+          </details>
 
           <div class="product-card__rating">
             ${stars}
@@ -229,15 +254,16 @@ class ShopSection {
           </div>
 
           <button
+            type="button"
             class="product-card__cta"
             data-id="${product.id}"
             ${isOOS ? 'disabled' : ''}
-            aria-label="${i18n.t('product.addToCart')}: ${name}"
+            aria-label="${i18n.t('product.addToCart')}: ${title}"
           >
-            <span class="product-card__cta-icon">
+            <span class="product-card__cta-icon" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             </span>
-            <span>${isOOS ? i18n.t('product.outOfStock') : i18n.t('product.addToCart')}</span>
+            <span data-i18n="${isOOS ? 'product.outOfStock' : 'product.addToCart'}">${isOOS ? i18n.t('product.outOfStock') : i18n.t('product.addToCart')}</span>
           </button>
         </div>
       </article>
@@ -265,9 +291,15 @@ class ShopSection {
     this._el.querySelectorAll('.filter-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         this._activeFilter = btn.dataset.filter;
-        this._render();
-        this._initIntersectionObserver();
+        this._activeBrand  = null;
+        this._refresh(true);
       });
+    });
+
+    const clearBrandBtn = this._el.querySelector('#btn-clear-brand');
+    clearBrandBtn?.addEventListener('click', () => {
+      this._activeBrand = null;
+      this._refresh(true);
     });
   }
 
@@ -276,26 +308,27 @@ class ShopSection {
     this._el.querySelectorAll('.product-card__cta').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const id = btn.dataset.id;
+        const id      = btn.dataset.id;
         const product = products.find(p => p.id === id);
         if (!product || product.stock.status === 'out_of_stock') return;
 
         cartStore.add(product);
 
+        const lang  = i18n.lang;
+        const title = product.title?.[lang] ?? product.name?.[lang] ?? product.title?.fr ?? product.name?.fr ?? '';
+
         // Visual feedback
         const original = btn.innerHTML;
         btn.classList.add('added');
-        btn.innerHTML = `<span>✓</span><span>${i18n.lang === 'ar' ? 'تمت الإضافة!' : 'Ajouté !'}</span>`;
+        btn.innerHTML = `<span>✓</span><span>${i18n.t('product.added')}</span>`;
         setTimeout(() => {
           btn.classList.remove('added');
           btn.innerHTML = original;
         }, 1800);
 
-        const lang = i18n.lang;
-        const name = product.name?.[lang] ?? product.name?.fr;
         showToast(
-          lang === 'ar' ? `✓ "${name}" أضيف للسلة` : `✓ "${name}" ajouté au panier`,
-          { type: 'success', icon: '🛒', duration: 2500 }
+          i18n.t('product.addedToast', { name: title }),
+          { type: 'success', icon: '✦', duration: 2500 }
         );
 
         // Open cart
@@ -310,13 +343,13 @@ class ShopSection {
         const id = btn.dataset.id;
         if (this._wishlist.has(id)) {
           this._wishlist.delete(id);
-          btn.textContent = '🤍';
+          btn.innerHTML = HEART_SVG;
           btn.classList.remove('active');
         } else {
           this._wishlist.add(id);
-          btn.textContent = '❤️';
+          btn.innerHTML = HEART_FILLED_SVG;
           btn.classList.add('active');
-          showToast(i18n.lang === 'ar' ? 'أضيف إلى المفضلة ❤️' : 'Ajouté aux favoris ❤️', { type: 'info', icon: '❤️' });
+          showToast(i18n.t('product.wishlistAdded'), { type: 'info', icon: '✦' });
         }
         localStorage.setItem('beauty-store:wishlist', JSON.stringify([...this._wishlist]));
       });
@@ -325,25 +358,40 @@ class ShopSection {
 
   // ── Intersection observer (animate cards in) ───────────────────────────
   _initIntersectionObserver() {
-    const cards = this._el.querySelectorAll('.product-card');
-    const obs = new IntersectionObserver(entries => {
+    if (!this._el) return;
+    if (this._obs) this._obs.disconnect();
+
+    const cards = this._el.querySelectorAll('.product-card:not(.visible)');
+    if (!cards.length) return;
+
+    this._obs = new IntersectionObserver(entries => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 60);
-          obs.unobserve(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), Math.min(i * 35, 250));
+          this._obs.unobserve(entry.target);
         }
       });
     }, { threshold: 0.05 });
-    cards.forEach(c => obs.observe(c));
+
+    cards.forEach(c => this._obs.observe(c));
   }
 
   // ── Filtering ──────────────────────────────────────────────────────────
   _getFiltered() {
+    if (this._activeBrand) {
+      return products.filter(p => p.brand.toLowerCase() === this._activeBrand.toLowerCase());
+    }
     if (this._activeFilter === 'all') return products;
     return products.filter(p => p.category === this._activeFilter);
   }
 
-  _refresh() { if (this._el) this._render(); this._initIntersectionObserver(); }
+  _refresh(immediateVisible = true) {
+    if (!this._el) return;
+    this._render(immediateVisible);
+    if (!immediateVisible) {
+      this._initIntersectionObserver();
+    }
+  }
 }
 
 export default ShopSection;

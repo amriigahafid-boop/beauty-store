@@ -596,85 +596,109 @@ section.hero {
 
 @media (max-width: 768px) {
   section.hero {
-    padding: 12px 12px 8px;
+    padding: 6px 12px 2px;
   }
 
   .lux-bento__shell {
-    border-radius: 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 26px rgba(24, 21, 22, 0.05);
   }
 
   .lux-bento__slide {
-    padding: 24px 16px 64px;
+    padding: 16px 16px 26px;
+    min-height: 0;
   }
 
   .lux-bento__grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 12px;
     width: 100%;
   }
 
   .lux-bento__copy {
     width: 100%;
     min-width: 0;
+    text-align: start;
+    align-items: flex-start;
+  }
+
+  .lux-bento__proof-pill,
+  .lux-bento__subtitle,
+  .lux-bento__trust-list,
+  .lux-bento__btn-ghost,
+  .lux-bento__spotlight,
+  .lux-bento__photo-badge,
+  .lux-bento__arrows {
+    display: none !important;
+  }
+
+  .lux-bento__eyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+  }
+
+  .lux-bento__title {
+    font-size: clamp(1.32rem, 5.2vw, 1.6rem);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  [dir="rtl"] .lux-bento__title {
+    font-size: clamp(1.2rem, 4.8vw, 1.45rem);
+    line-height: 1.22;
   }
 
   .lux-bento__cta-row {
-    width: 100%;
-    flex-direction: column;
-    gap: 10px;
+    width: auto;
+    justify-content: flex-start;
+    margin-bottom: 0;
   }
 
-  .lux-bento__btn-primary,
-  .lux-bento__btn-ghost {
-    width: 100%;
+  .lux-bento__btn-primary {
+    width: auto;
+    padding: 9px 16px;
+    font-size: 0.76rem;
+    gap: 6px;
+    box-shadow: 0 6px 16px rgba(157, 59, 92, 0.22);
+    touch-action: manipulation;
+  }
+
+  .lux-bento__btn-primary svg {
+    width: 13px;
+    height: 13px;
   }
 
   .lux-bento__visual {
     position: static;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    display: block;
   }
 
   .lux-bento__photo-frame {
     width: 100%;
     max-width: 100%;
-    height: 210px;
+    height: 126px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(24, 21, 22, 0.08);
   }
 
-  .lux-bento__spotlight {
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    margin-top: 0;
-    padding: 14px;
-    grid-template-columns: 68px minmax(0, 1fr);
-    gap: 12px;
-    box-sizing: border-box;
+  .lux-bento__controls {
+    bottom: 8px;
+    left: 16px;
+    right: 16px;
+    justify-content: center;
   }
 
-  .lux-bento__spotlight-thumb {
-    width: 68px;
-    height: 68px;
+  .lux-bento__dot {
+    width: 6px;
+    height: 6px;
   }
 
-  .lux-bento__spotlight-title {
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
-  .lux-bento__spotlight-bottom {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .lux-bento__spotlight-actions {
-    flex-wrap: wrap;
+  .lux-bento__dot.is-active {
+    width: 20px;
   }
 }
 

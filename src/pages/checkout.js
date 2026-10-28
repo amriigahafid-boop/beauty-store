@@ -162,7 +162,7 @@ function renderCheckout() {
                   <div class="summary-item">
                     <div class="summary-item__image">
                       ${imgUrl
-                        ? `<img src="${imgUrl}" alt="${name}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+                        ? `<img src="${imgUrl}" alt="${name}" loading="lazy" decoding="async" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
                         : (item.emoji || '🧴')
                       }
                       <span class="summary-item__qty-badge">${item.qty}</span>
@@ -346,7 +346,7 @@ function renderCheckout() {
                   <div class="summary-item">
                     <div class="summary-item__image">
                       ${imgUrl
-                        ? `<img src="${imgUrl}" alt="${name}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+                        ? `<img src="${imgUrl}" alt="${name}" loading="lazy" decoding="async" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
                         : (item.emoji || '🧴')
                       }
                       <span class="summary-item__qty-badge">${item.qty}</span>

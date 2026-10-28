@@ -561,12 +561,17 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.pdp-rel-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(24, 21, 22, 0.08);
+@media (hover: hover) and (pointer: fine) {
+  .pdp-rel-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(24, 21, 22, 0.08);
+  }
 }
 
 .pdp-rel-card__media {

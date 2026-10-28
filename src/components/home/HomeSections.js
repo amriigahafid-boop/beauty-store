@@ -155,6 +155,7 @@ export default class HomeSections {
                     src="${c.img}"
                     alt="${c.title}"
                     loading="lazy"
+                    decoding="async"
                     onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                   />
                 </div>
@@ -238,9 +239,13 @@ export default class HomeSections {
                 muted
                 loop
                 playsinline
+                webkit-playsinline
                 preload="auto"
                 disablePictureInPicture
-              ></video>
+              >
+                <source src="/videos/botanical-hair-ritual.mp4" type="video/mp4" />
+                <source src="public/videos/botanical-hair-ritual.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>
@@ -275,6 +280,7 @@ export default class HomeSections {
                   src="${items[0].images.main}"
                   alt="${t0}"
                   loading="lazy"
+                  decoding="async"
                   onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                 />
               </a>
@@ -284,6 +290,7 @@ export default class HomeSections {
                   src="${items[1].images.main}"
                   alt="${t1}"
                   loading="lazy"
+                  decoding="async"
                   onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                 />
               </a>
@@ -471,46 +478,57 @@ export default class HomeSections {
         });
       });
 
-      // Promotional Video: pure ambient autoplay, 2.0s start & loop reset
+      // Promotional Video: continuous ambient autoplay on iOS/Safari & Android/Desktop
       const videoEl = this._bottomRoot.querySelector('#botanical-ritual-video');
 
       if (videoEl) {
         const TRIM_START = 2.0;
         let initialTrimDone = false;
 
-        videoEl.muted        = true;
-        videoEl.defaultMuted = true;
-        videoEl.volume       = 0;
-        videoEl.controls     = false;
-        videoEl.removeAttribute('controls');
+        // Programmatically enforce mute & inline attributes so iOS/Safari never blocks autoplay
+        const enforceMutedInline = () => {
+          videoEl.muted        = true;
+          videoEl.defaultMuted = true;
+          videoEl.volume       = 0;
+          videoEl.playsInline  = true;
+          videoEl.loop         = true;
+          videoEl.autoplay     = true;
+          videoEl.controls     = false;
+          videoEl.setAttribute('muted', '');
+          videoEl.setAttribute('autoplay', '');
+          videoEl.setAttribute('loop', '');
+          videoEl.setAttribute('playsinline', '');
+          videoEl.setAttribute('webkit-playsinline', '');
+          videoEl.removeAttribute('controls');
+        };
+
+        enforceMutedInline();
+
+        const tryPlay = () => {
+          enforceMutedInline();
+          const playPromise = videoEl.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {});
+          }
+        };
 
         const startFromTrim = () => {
-          if (initialTrimDone) return;
-          initialTrimDone = true;
-          videoEl.muted   = true;
-          try {
-            videoEl.currentTime = TRIM_START;
-          } catch (_) {
-            // Ignore if currentTime cannot be set yet
+          enforceMutedInline();
+          if (!initialTrimDone && videoEl.readyState >= 1) {
+            initialTrimDone = true;
+            try {
+              if (Number.isFinite(videoEl.duration) && videoEl.duration > TRIM_START + 1) {
+                videoEl.currentTime = TRIM_START;
+              }
+            } catch (_) {
+              // Ignore if currentTime cannot be set yet
+            }
           }
-
-          // If the dev server lacks HTTP 206 Range support, currentTime resets to 0.
-          // Upgrade to an in-memory Blob URL once so 2.0s seek & loop work 100% reliably.
-          if (videoEl.currentTime < 1.5 && !videoEl.dataset.blobUpgraded) {
-            videoEl.dataset.blobUpgraded = '1';
-            fetch(videoEl.currentSrc || '/videos/botanical-hair-ritual.mp4')
-              .then(r => (r.ok ? r.blob() : Promise.reject()))
-              .then(blob => {
-                initialTrimDone = false;
-                videoEl.src = URL.createObjectURL(blob);
-              })
-              .catch(() => {});
-          }
-
-          videoEl.play().catch(e => console.log('Autoplay deferred:', e));
+          tryPlay();
         };
 
         videoEl.addEventListener('loadedmetadata', startFromTrim);
+        videoEl.addEventListener('loadeddata', startFromTrim);
         videoEl.addEventListener('canplay', startFromTrim);
 
         videoEl.addEventListener('play', () => {
@@ -522,31 +540,59 @@ export default class HomeSections {
           if (
             Number.isFinite(videoEl.duration) &&
             videoEl.duration > TRIM_START &&
-            videoEl.currentTime >= videoEl.duration - 0.1
+            videoEl.currentTime >= videoEl.duration - 0.12
           ) {
-            videoEl.currentTime = TRIM_START;
+            try {
+              videoEl.currentTime = TRIM_START;
+            } catch (_) {}
             if (videoEl.paused) {
-              videoEl.play().catch(e => console.log('Autoplay deferred:', e));
+              tryPlay();
             }
           }
         });
 
         videoEl.addEventListener('ended', () => {
-          videoEl.currentTime = TRIM_START;
-          videoEl.play().catch(e => console.log('Autoplay deferred:', e));
+          try {
+            videoEl.currentTime = TRIM_START;
+          } catch (_) {}
+          tryPlay();
         });
 
         videoEl.addEventListener('error', () => {
           if (!videoEl.dataset.fallbackTried) {
             videoEl.dataset.fallbackTried = '1';
             initialTrimDone = false;
-            videoEl.src = '/public/videos/botanical-hair-ritual.mp4';
+            videoEl.src = 'public/videos/botanical-hair-ritual.mp4';
             videoEl.load();
+            tryPlay();
           }
         });
 
+        // IntersectionObserver ensures video autoplays immediately when scrolled into view
+        if ('IntersectionObserver' in window) {
+          const videoObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && videoEl.paused) {
+                tryPlay();
+              }
+            });
+          }, { threshold: 0.1 });
+          videoObserver.observe(videoEl);
+        }
+
+        // Fallback for strict iOS Low Power Mode / touch wakeup
+        const unlockOnFirstInteraction = () => {
+          if (videoEl.paused) {
+            tryPlay();
+          }
+        };
+        document.addEventListener('touchstart', unlockOnFirstInteraction, { once: true, passive: true });
+        document.addEventListener('scroll', unlockOnFirstInteraction, { once: true, passive: true });
+
         if (videoEl.readyState >= 1) {
           startFromTrim();
+        } else {
+          tryPlay();
         }
       }
     }

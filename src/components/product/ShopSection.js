@@ -59,13 +59,12 @@ class ShopSection {
   mount(container) {
     this._el = typeof container === 'string' ? document.querySelector(container) : container;
     if (!this._el) return this;
-    this._render(false);
-    this._initIntersectionObserver();
+    this._render(true);
     return this;
   }
 
   // ── Render ─────────────────────────────────────────────────────────────
-  _render(immediateVisible = false) {
+  _render(immediateVisible = true) {
     if (!this._el) return;
     const lang     = i18n.lang;
     const filtered = this._getFiltered();
@@ -213,7 +212,7 @@ class ShopSection {
 
           <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-card__image-link" aria-label="${title}">
             ${product.images?.main
-              ? `<img src="${product.images.main}" alt="${title}" class="product-card__image" loading="lazy" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+              ? `<img src="${product.images.main}" alt="${title}" class="product-card__image" loading="lazy" decoding="async" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
               : `<div class="product-card__image">${emoji}</div>`}
           </a>
 
@@ -304,6 +303,25 @@ class ShopSection {
   }
 
   _bindCardEvents() {
+    // Single-tap navigation on the entire product card (mobile & desktop)
+    this._el.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Ignore clicks on interactive controls (Add to Cart, Wishlist, Quick View accordion, or direct anchor links)
+        if (
+          e.target.closest('.product-card__cta') ||
+          e.target.closest('.product-card__wishlist') ||
+          e.target.closest('.product-card__quick-view') ||
+          e.target.closest('a[href]')
+        ) {
+          return;
+        }
+        const id = card.dataset.id;
+        if (id) {
+          window.location.href = `product.html?id=${encodeURIComponent(id)}`;
+        }
+      });
+    });
+
     // Add to cart
     this._el.querySelectorAll('.product-card__cta').forEach(btn => {
       btn.addEventListener('click', (e) => {

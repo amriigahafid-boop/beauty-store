@@ -104,11 +104,6 @@ export default class HeroSlider {
 
             <!-- Editorial Copy Column -->
             <div class="lux-bento__copy">
-              <div class="lux-bento__proof-pill">
-                <span class="lux-bento__proof-stars" aria-hidden="true">★★★★★</span>
-                <span data-i18n="${prefix}.proof">${proof}</span>
-              </div>
-
               <p class="lux-bento__eyebrow" data-i18n="${prefix}.eyebrow">${eyebrow}</p>
 
               <h1 class="lux-bento__title" ${h1Id}>
@@ -126,20 +121,7 @@ export default class HeroSlider {
                     <polyline points="12 5 19 12 12 19"></polyline>
                   </svg>
                 </a>
-
-                <a href="${pUrl}" class="lux-bento__btn-ghost">
-                  <span data-i18n="${prefix}.ctaProduct">${ctaProduct}</span>
-                </a>
               </div>
-
-              <ul class="lux-bento__trust-list">
-                ${trustItems.map((item, tIdx) => `
-                  <li class="lux-bento__trust-item">
-                    <span class="lux-bento__trust-dot" aria-hidden="true">✓</span>
-                    <span data-i18n="hero.trust${tIdx + 1}">${item}</span>
-                  </li>
-                `).join('')}
-              </ul>
             </div>
 
             <!-- Visual Backdrop + Floating Product Spotlight Card -->
@@ -150,6 +132,7 @@ export default class HeroSlider {
                   alt="${titleMain} ${titleAccent}"
                   class="lux-bento__photo-crop"
                   loading="${idx === 0 ? 'eager' : 'lazy'}"
+                  decoding="async"
                   onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                 />
                 <div class="lux-bento__photo-badge">
@@ -164,7 +147,8 @@ export default class HeroSlider {
                   <img
                     src="${product.images.main}"
                     alt="${pTitle}"
-                    loading="eager"
+                    loading="lazy"
+                    decoding="async"
                     onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                   />
                 </a>

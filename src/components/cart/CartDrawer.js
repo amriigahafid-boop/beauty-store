@@ -206,7 +206,7 @@ class CartDrawer {
     return `
       <div class="cart-item" data-key="${item.key}">
         ${(item.image || item.mainImage)
-          ? `<img src="${item.image || item.mainImage}" alt="${title}" class="cart-item__image" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
+          ? `<img src="${item.image || item.mainImage}" alt="${title}" class="cart-item__image" loading="lazy" decoding="async" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}" />`
           : `<div class="cart-item__image">${item.emoji}</div>`}
         <div class="cart-item__details">
           <div class="cart-item__brand">${item.brand}</div>

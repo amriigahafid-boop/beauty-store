@@ -144,6 +144,7 @@ function renderProductPage() {
               src="${product.images.main}"
               alt="${name}"
               class="pdp-gallery__img"
+              decoding="async"
               onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
             />
           </div>
@@ -311,12 +312,13 @@ function renderProductPage() {
             const rPrice = formatPrice(effectivePrice(item), lang);
             const rUrl   = `product.html?id=${encodeURIComponent(item.id)}`;
             return `
-              <article class="pdp-rel-card">
+              <article class="pdp-rel-card" data-url="${rUrl}">
                 <a href="${rUrl}" class="pdp-rel-card__media">
                   <img
                     src="${item.images.main}"
                     alt="${rName}"
                     loading="lazy"
+                    decoding="async"
                     onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
                   />
                 </a>
@@ -386,6 +388,15 @@ function bindProductEvents(product) {
   buyNowBtn?.addEventListener('click', () => {
     cartStore.add(product, currentQty);
     window.location.href = 'checkout.html';
+  });
+
+  // Single-tap navigation on related product cards
+  document.querySelectorAll('.pdp-rel-card[data-url]').forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.closest('a[href]')) return;
+      const url = card.dataset.url;
+      if (url) window.location.href = url;
+    });
   });
 }
 

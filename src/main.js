@@ -6,17 +6,15 @@
  *  1. i18n.init()        — load persisted language, apply dir/lang/translations
  *  2. CartDrawer         — mounts overlay + drawer into document.body
  *  3. Header             — replaces #header-root with rendered header
- *  4. HeroSlider         — mounts luxury hero carousel into #hero-carousel-root
- *  5. ShopSection        — renders product grid & guarantees into #shop-root
- *  6. HomeSections       — renders concerns, brands, bundles, reviews, FAQ
- *  7. Global listeners   — cart badge, langchange title sync, Escape key, scroll nav
+ *  4. ShopSection        — renders product grid & guarantees into #shop-root
+ *  5. HomeSections       — renders concerns, brands, bundles, reviews, FAQ
+ *  6. Global listeners   — cart badge, langchange title sync, Escape key, scroll nav
  */
 
 import i18n         from './context/i18n.js';
 import cartStore    from './context/cartStore.js';
 import Header       from './components/layout/Header.js';
 import CartDrawer   from './components/cart/CartDrawer.js';
-import HeroSlider   from './components/hero/HeroSlider.js';
 import ShopSection  from './components/product/ShopSection.js';
 import HomeSections from './components/home/HomeSections.js';
 
@@ -46,22 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── 4. Hero Slider ─────────────────────────────────────────────────────────
-  new HeroSlider({ cartDrawer }).mount('#hero-carousel-root');
-
-  // ── 5. Shop section ────────────────────────────────────────────────────────
+  // ── 4. Shop section ────────────────────────────────────────────────────────
   const shopRoot = document.getElementById('shop-root');
   if (shopRoot) {
     new ShopSection({ cartDrawer }).mount(shopRoot);
   }
 
-  // ── 6. Additional Homepage Sections (Concerns, Brands, Bundles, Reviews, FAQ)
+  // ── 5. Additional Homepage Sections (Concerns, Brands, Bundles, Reviews, FAQ)
   new HomeSections({ cartDrawer }).mount({
     topRoot:    '#home-top-sections',
     bottomRoot: '#home-bottom-sections',
   });
 
-  // Ensure all [data-i18n] nodes (including Footer) match the active locale
+  // Ensure all [data-i18n] nodes (including Static Hero & Footer) match the active locale
   i18n.applyTranslations();
 
   // ── 7. Global listeners ────────────────────────────────────────────────────

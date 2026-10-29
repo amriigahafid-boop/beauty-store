@@ -47,8 +47,11 @@ const ar = {
   /* ---- Announcement Bar ---- */
   announcement: "توصيل مجاني لجميع المدن المغربية للطلبات فوق 500 درهم • الدفع عند الاستلام • منتجات أصلية 100% مستوردة من تركيا",
 
-  /* ---- Hero section (Luxury Bento & Product Spotlight) ---- */
+  /* ---- Hero section (Static Luxury Banner) ---- */
   hero: {
+    tag:            "مجموعة خاصة • تركيا",
+    title:          "فن العناية النباتية الفاخرة",
+    cta:            "تصفحي المتجر",
     regionLabel:    "العرض الرئيسي لوميير",
     exclusiveBadge: "حصري لدى لوميير",
     viewDetails:    "التفاصيل",

@@ -115,7 +115,7 @@ class ShopSection {
           ` : ''}
 
           <!-- Product grid -->
-          <div class="product-grid" id="product-grid">
+          <div class="product-grid products-grid" id="products-grid">
             ${filtered.map(p => this._renderCard(p, lang, immediateVisible)).join('')}
           </div>
 

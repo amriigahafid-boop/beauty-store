@@ -47,9 +47,12 @@ const fr = {
   /* ---- Announcement Bar ---- */
   announcement: "Livraison gratuite partout au Maroc dès 500 DH d'achat • Paiement à la livraison • Soins 100% Authentiques importés de Turquie",
 
-  /* ---- Hero section (Luxury Bento & Product Spotlight) ---- */
+  /* ---- Hero section (Static Luxury Banner) ---- */
   hero: {
-    regionLabel:    "Carrousel principal Lumière",
+    tag:            "Collection Privée • Turquie",
+    title:          "L'Art du Soin Botanique",
+    cta:            "Explorer la Boutique",
+    regionLabel:    "Bannière principale Lumière",
     exclusiveBadge: "Exclusivité Lumière",
     viewDetails:    "Détails",
     quickAdd:       "Ajouter",

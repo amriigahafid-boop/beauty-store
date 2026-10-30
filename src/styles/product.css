@@ -69,34 +69,35 @@
 .pdp-gallery__stage {
   position: relative;
   width: 100%;
+  height: 460px;
   aspect-ratio: 1 / 1;
-  max-height: 520px;
-  background: radial-gradient(circle at 50% 50%, #FFFFFF 55%, #F8F3EC 100%);
-  border-radius: 28px;
+  background: #fcfafa;
+  border-radius: 26px;
   border: 1px solid var(--pdp-border);
-  box-shadow: 0 24px 56px rgba(24, 21, 22, 0.06);
-  padding: clamp(28px, 4vw, 48px);
+  box-shadow: 0 20px 48px rgba(24, 21, 22, 0.05);
+  padding: clamp(24px, 3.5vw, 40px);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .pdp-gallery__badges {
   position: absolute;
-  top: 20px;
-  inset-inline-start: 20px;
+  top: 16px;
+  inset-inline-start: 16px;
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pdp-badge {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 999px;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -108,31 +109,30 @@
 }
 
 .pdp-badge--outline {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(24, 21, 22, 0.14);
   color: var(--pdp-ink);
 }
 
 .pdp-gallery__img {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
+  object-fit: contain !important;
+  object-position: center center;
   display: block;
-  filter: brightness(1.04) contrast(1.05);
+  margin: 0 auto;
+  filter: brightness(1.03) contrast(1.04);
   mix-blend-mode: multiply;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.pdp-gallery__stage:hover .pdp-gallery__img {
-  transform: scale(1.06);
+  transform: none !important;
 }
 
 .pdp-trust-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  margin-bottom: 24px;
 }
 
 .pdp-trust-card {
@@ -575,18 +575,30 @@
 }
 
 .pdp-rel-card__media {
+  position: relative;
+  width: 100%;
+  height: 195px;
   aspect-ratio: 1 / 1;
-  padding: 20px;
-  background: #FAF6F1;
+  padding: 18px;
+  background: #fcfafa;
+  border-bottom: 1px solid var(--pdp-border);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .pdp-rel-card__media img {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;
+  object-fit: contain !important;
+  object-position: center center;
+  display: block;
+  margin: 0 auto;
   mix-blend-mode: multiply;
 }
 
@@ -617,6 +629,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.3em;
 }
 
 .pdp-rel-card__title:hover {
@@ -667,7 +680,7 @@
 
 @media (max-width: 768px) {
   .pdp {
-    padding-block: 16px 48px;
+    padding-block: 8px 44px;
     overflow-x: hidden;
   }
 
@@ -676,30 +689,35 @@
   }
 
   .pdp-breadcrumb {
-    margin-bottom: 18px;
-    font-size: 0.76rem;
+    margin-bottom: 10px;
+    font-size: 0.72rem;
+    gap: 5px;
   }
 
   .pdp-main {
     grid-template-columns: 1fr;
-    gap: 28px;
-    margin-bottom: 44px;
+    gap: 14px;
+    margin-bottom: 36px;
   }
 
   .pdp-gallery__stage {
-    max-height: 350px;
-    padding: 24px;
-    border-radius: 22px;
+    height: 228px;
+    max-height: 228px;
+    aspect-ratio: auto;
+    padding: 16px 20px;
+    border-radius: 18px;
+    background: #fcfafa;
   }
 
-  .pdp-trust-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+  .pdp-gallery__badges {
+    top: 12px;
+    inset-inline-start: 12px;
+    gap: 5px;
   }
 
-  .pdp-trust-card {
-    min-width: 0;
-    overflow-wrap: break-word;
+  .pdp-badge {
+    padding: 4px 10px;
+    font-size: 0.62rem;
   }
 
   .pdp-info {
@@ -707,36 +725,111 @@
     width: 100%;
   }
 
+  .pdp-info__top-meta {
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+  }
+
+  .pdp-info__sku {
+    display: none;
+  }
+
   .pdp-info__title {
-    font-size: clamp(1.65rem, 6vw, 2.15rem);
+    font-size: clamp(1.38rem, 5.2vw, 1.72rem);
+    line-height: 1.15;
+    margin-bottom: 4px;
     overflow-wrap: break-word;
   }
 
+  .pdp-info__tagline {
+    font-size: 0.86rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
   .pdp-info__price-bar {
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    border-radius: 14px;
+    gap: 8px;
   }
 
   .pdp-info__price {
-    font-size: 1.5rem;
+    font-size: 1.38rem;
+  }
+
+  .pdp-info__tax-note {
+    font-size: 0.68rem;
+  }
+
+  .pdp-info__rating-pill {
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+
+  .pdp-buy-box {
+    gap: 8px;
+    margin-bottom: 18px;
   }
 
   .pdp-buy-box__row {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 8px;
   }
 
   .pdp-qty {
     width: 100%;
-    padding: 6px 14px;
+    padding: 3px 6px;
   }
 
-  .pdp-btn-cart,
+  .pdp-qty__btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.05rem;
+  }
+
+  .pdp-btn-cart {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.82rem;
+    gap: 6px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
   .pdp-btn-buy-now {
     width: 100%;
-    padding: 15px 18px;
+    padding: 12px 16px;
+    font-size: 0.8rem;
     white-space: normal;
     text-align: center;
+  }
+
+  .pdp-ingredients {
+    margin-bottom: 16px;
+  }
+
+  .pdp-ingredients__label {
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+  }
+
+  .pdp-ingredient-pill {
+    padding: 5px 11px;
+    font-size: 0.76rem;
+  }
+
+  .pdp-trust-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .pdp-trust-card {
+    padding: 11px 14px;
+    min-width: 0;
+    overflow-wrap: break-word;
   }
 
   .pdp-reviews {
@@ -765,23 +858,38 @@
 
   .pdp-rel-card {
     min-width: 0;
+    border-radius: 16px;
   }
 
   .pdp-rel-card__media {
+    height: 155px;
+    aspect-ratio: 1 / 1;
     padding: 14px;
+    background: #fcfafa;
   }
 
   .pdp-rel-card__body {
     padding: 12px;
+    gap: 4px;
+  }
+
+  .pdp-rel-card__title {
+    font-size: 0.82rem;
+    min-height: 2.4em;
   }
 
   .pdp-rel-card__bottom {
     flex-wrap: wrap;
     gap: 6px;
+    padding-top: 8px;
+  }
+
+  .pdp-rel-card__price {
+    font-size: 0.88rem;
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 340px) {
   .pdp-related__grid {
     grid-template-columns: 1fr;
   }

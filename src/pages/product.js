@@ -131,7 +131,7 @@ function renderProductPage() {
       <!-- Main 2-Column Product Hero -->
       <section class="pdp-main">
 
-        <!-- Left Column: Sticky Visual Gallery -->
+        <!-- Left Column: Visual Gallery Stage -->
         <div class="pdp-gallery">
           <div class="pdp-gallery__stage">
             <div class="pdp-gallery__badges">
@@ -147,24 +147,6 @@ function renderProductPage() {
               decoding="async"
               onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
             />
-          </div>
-
-          <!-- Trust Highlights Below Image -->
-          <div class="pdp-trust-grid">
-            <div class="pdp-trust-card">
-              <span class="pdp-trust-card__icon">🇲🇦</span>
-              <div>
-                <strong>${isAr ? 'توصيل سريع 24–48 ساعة' : 'Livraison 24–48h au Maroc'}</strong>
-                <span>${isAr ? 'مجاني للطلبات فوق 500 درهم' : 'Gratuite dès 500 DH d’achat'}</span>
-              </div>
-            </div>
-            <div class="pdp-trust-card">
-              <span class="pdp-trust-card__icon">💵</span>
-              <div>
-                <strong>${isAr ? 'الدفع عند الاستلام' : 'Paiement à la livraison'}</strong>
-                <span>${isAr ? 'افحصي طلبكِ وادفعي بأمان' : 'Payez à la réception en DH'}</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -196,17 +178,7 @@ function renderProductPage() {
             </a>
           </div>
 
-          <!-- Active Ingredients Pills -->
-          <div class="pdp-ingredients">
-            <span class="pdp-ingredients__label">${isAr ? 'المكونات الفعّالة الرئيسية:' : 'Actifs clés de la formule :'}</span>
-            <div class="pdp-ingredients__list">
-              ${ingredients.map(ing => `
-                <span class="pdp-ingredient-pill">✦ ${ing}</span>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Purchase Controls (Quantity + Add to Cart + Direct Buy) -->
+          <!-- Primary Call-to-Action Container (Immediately below title, short description & price) -->
           <div class="pdp-buy-box">
             <div class="pdp-buy-box__row">
               <div class="pdp-qty" aria-label="Quantity">
@@ -230,6 +202,34 @@ function renderProductPage() {
             <button type="button" class="pdp-btn-buy-now" id="pdp-buy-now">
               <span>⚡ ${isAr ? 'اطلبي الآن — الدفع عند الاستلام' : 'Commander maintenant — Paiement à la livraison'}</span>
             </button>
+          </div>
+
+          <!-- Active Ingredients Pills -->
+          <div class="pdp-ingredients">
+            <span class="pdp-ingredients__label">${isAr ? 'المكونات الفعّالة الرئيسية:' : 'Actifs clés de la formule :'}</span>
+            <div class="pdp-ingredients__list">
+              ${ingredients.map(ing => `
+                <span class="pdp-ingredient-pill">✦ ${ing}</span>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Secondary Informational Cards (Shipping & Cash on Delivery) -->
+          <div class="pdp-trust-grid">
+            <div class="pdp-trust-card">
+              <span class="pdp-trust-card__icon">🇲🇦</span>
+              <div>
+                <strong>${isAr ? 'توصيل سريع 24–48 ساعة' : 'Livraison 24–48h au Maroc'}</strong>
+                <span>${isAr ? 'مجاني للطلبات فوق 500 درهم' : 'Gratuite dès 500 DH d’achat'}</span>
+              </div>
+            </div>
+            <div class="pdp-trust-card">
+              <span class="pdp-trust-card__icon">💵</span>
+              <div>
+                <strong>${isAr ? 'الدفع عند الاستلام' : 'Paiement à la livraison'}</strong>
+                <span>${isAr ? 'افحصي طلبكِ وادفعي بأمان' : 'Payez à la réception en DH'}</span>
+              </div>
+            </div>
           </div>
 
           <!-- Luxury Accordions -->
@@ -308,7 +308,7 @@ function renderProductPage() {
 
         <div class="pdp-related__grid">
           ${related.map(item => {
-            const rName  = item.name?.[lang] ?? item.name?.fr ?? '';
+            const rName  = item.title?.[lang] ?? item.name?.[lang] ?? item.title?.fr ?? item.name?.fr ?? '';
             const rPrice = formatPrice(effectivePrice(item), lang);
             const rUrl   = `product.html?id=${encodeURIComponent(item.id)}`;
             return `

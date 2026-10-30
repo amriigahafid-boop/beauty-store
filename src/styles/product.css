@@ -253,16 +253,19 @@
   flex-wrap: wrap;
 }
 
-.pdp-info__price {
+.pdp-info__price,
+.pdp-info__price.current-price {
   display: inline-block;
   font-family: var(--font-sans);
   font-size: 1.75rem;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   color: var(--primary-color, #9D3B5C) !important;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
-.pdp-info__price-old {
+.pdp-info__price-old,
+.pdp-info__price-old.old-price {
   display: inline-block;
   font-family: var(--font-sans);
   font-size: 0.85em !important;
@@ -270,6 +273,7 @@
   color: #888888 !important;
   text-decoration: line-through !important;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .pdp-info__tax-note {
@@ -673,19 +677,23 @@
   flex-wrap: wrap;
 }
 
-.pdp-rel-card__price {
+.pdp-rel-card__price,
+.pdp-rel-card__price.current-price {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 600 !important;
+  font-size: 0.96rem;
+  font-weight: 700 !important;
   color: var(--primary-color, #9D3B5C) !important;
+  font-variant-numeric: tabular-nums;
 }
 
-.pdp-rel-card__price-old {
+.pdp-rel-card__price-old,
+.pdp-rel-card__price-old.old-price {
   font-family: var(--font-sans);
   font-size: 0.85em !important;
   font-weight: 400 !important;
   color: #888888 !important;
   text-decoration: line-through !important;
+  font-variant-numeric: tabular-nums;
 }
 
 .pdp-rel-card__link {
@@ -793,8 +801,16 @@
     gap: 8px;
   }
 
-  .pdp-info__price {
-    font-size: 1.38rem;
+  .pdp-info__price,
+  .pdp-info__price.current-price {
+    font-size: 1.42rem;
+    font-weight: 700 !important;
+  }
+
+  .pdp-info__price-old,
+  .pdp-info__price-old.old-price {
+    font-size: 0.85em !important;
+    font-weight: 400 !important;
   }
 
   .pdp-info__tax-note {
@@ -925,8 +941,16 @@
     padding-top: 8px;
   }
 
-  .pdp-rel-card__price {
-    font-size: 0.88rem;
+  .pdp-rel-card__price,
+  .pdp-rel-card__price.current-price {
+    font-size: 0.92rem;
+    font-weight: 700 !important;
+  }
+
+  .pdp-rel-card__price-old,
+  .pdp-rel-card__price-old.old-price {
+    font-size: 0.8em !important;
+    font-weight: 400 !important;
   }
 }
 

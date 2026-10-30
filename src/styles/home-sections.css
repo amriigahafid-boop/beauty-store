@@ -520,19 +520,23 @@
   gap: 8px;
 }
 
-.hs-bundle-card__price-now {
+.hs-bundle-card__price-now,
+.hs-bundle-card__price-now.current-price {
   font-family: var(--font-sans);
   font-size: 1.35rem;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   color: var(--primary-color, #9D3B5C) !important;
+  font-variant-numeric: tabular-nums;
 }
 
-.hs-bundle-card__price-old {
+.hs-bundle-card__price-old,
+.hs-bundle-card__price-old.old-price {
   font-family: var(--font-sans);
   font-size: 0.85em !important;
   font-weight: 400 !important;
   color: #888888 !important;
   text-decoration: line-through !important;
+  font-variant-numeric: tabular-nums;
 }
 
 .hs-bundle-card__save {

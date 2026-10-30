@@ -366,23 +366,28 @@ img.product-card__image {
 
 .product-card__price,
 .current-price {
+  font-family: var(--font-sans);
   font-size: var(--fs-lg);
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   color: var(--primary-color, #9D3B5C) !important;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .product-card__price--sale {
+  font-weight: 700 !important;
   color: var(--primary-color, #9D3B5C) !important;
 }
 
 .product-card__price-original,
 .old-price {
+  font-family: var(--font-sans);
   font-size: 0.85em !important;
   color: #888888 !important;
   text-decoration: line-through !important;
   font-weight: 400 !important;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 .product-card__discount-pct {
@@ -675,8 +680,15 @@ img.product-card__image {
     font-size: 0.64rem;
     text-align: center;
   }
-  .product-card__price {
-    font-size: 0.95rem;
+  .product-card__price,
+  .current-price {
+    font-size: 0.98rem;
+    font-weight: 700 !important;
+  }
+  .product-card__price-original,
+  .old-price {
+    font-size: 0.8em !important;
+    font-weight: 400 !important;
   }
   .product-card__price-row {
     margin-top: auto;

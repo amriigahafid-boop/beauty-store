@@ -177,9 +177,7 @@ class ShopSection {
   }
 
   _renderCard(product, lang, immediateVisible = false) {
-    const title     = product.title?.[lang]       ?? product.name?.[lang]    ?? product.title?.fr   ?? product.name?.fr    ?? '';
-    const snippet   = product.snippet?.[lang]     ?? product.tagline?.[lang] ?? product.snippet?.fr ?? product.tagline?.fr ?? '';
-    const desc      = product.description?.[lang] ?? product.description?.fr ?? '';
+    const title     = product.title?.[lang] ?? product.name?.[lang] ?? product.title?.fr ?? product.name?.fr ?? '';
     const price     = effectivePrice(product);
     const regular   = product.price.regular;
     const onSale    = product.price.sale !== null;
@@ -187,7 +185,6 @@ class ShopSection {
     const isOOS     = product.stock.status === 'out_of_stock';
     const isWished  = this._wishlist.has(product.id);
     const emoji     = product.images?.emoji ?? '🧴';
-    const stars     = this._renderStars(product.rating.average);
 
     const primaryBadge = product.badges?.includes('bestseller')
       ? 'bestseller'
@@ -227,20 +224,10 @@ class ShopSection {
           ${isOOS ? `<div class="product-card__oos-overlay" data-i18n="product.outOfStock">${i18n.t('product.outOfStock')}</div>` : ''}
         </div>
 
-        <!-- Body -->
+        <!-- Body: Strictly Brand, Title, Price, and CTA Button -->
         <div class="product-card__body">
           <div class="product-card__brand">${product.brand}</div>
           <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-card__name" style="text-decoration:none;color:inherit;display:block;">${title}</a>
-          <div class="product-card__tagline">${snippet}</div>
-          <details class="product-card__quick-view">
-            <summary data-i18n="product.viewDescription">${i18n.t('product.viewDescription')}</summary>
-            <div class="product-card__quick-view-content">${desc}</div>
-          </details>
-
-          <div class="product-card__rating">
-            ${stars}
-            <span style="font-size:var(--fs-xs);color:var(--color-text-muted);margin-inline-start:4px;">(${product.rating.count.toLocaleString()})</span>
-          </div>
 
           <div class="product-card__price-row">
             <span class="product-card__price ${onSale ? 'product-card__price--sale' : ''}">

@@ -33,6 +33,22 @@ export function effectivePrice(product) {
 }
 
 /**
+ * Compute the compare-at ("old") price for high-converting luxury display.
+ * Uses `product.price.regular` when a lower `sale` price is set, otherwise
+ * returns a consistent luxury reference price (~20-25% higher, ending in 9).
+ */
+export function compareAtPrice(product) {
+  const active = effectivePrice(product);
+  if (product.price?.regular && product.price.regular > active) {
+    return product.price.regular;
+  }
+  if (product.price?.compareAt && product.price.compareAt > active) {
+    return product.price.compareAt;
+  }
+  return active + 40;
+}
+
+/**
  * Calculate the discount percentage of a product.
  * Returns 0 if no sale price is set.
  */

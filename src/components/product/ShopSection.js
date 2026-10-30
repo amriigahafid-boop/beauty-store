@@ -11,7 +11,7 @@ import products                             from '../../data/products.data.js';
 import cartStore                            from '../../context/cartStore.js';
 import i18n                                 from '../../context/i18n.js';
 import { formatPrice }                      from '../../utils/currency.js';
-import { effectivePrice, discountPercent }  from '../../services/productService.js';
+import { effectivePrice, compareAtPrice, discountPercent } from '../../services/productService.js';
 import { showToast }                        from '../cart/CartDrawer.js';
 
 // Category filter config with minimalist SVG icons
@@ -179,9 +179,7 @@ class ShopSection {
   _renderCard(product, lang, immediateVisible = false) {
     const title     = product.title?.[lang] ?? product.name?.[lang] ?? product.title?.fr ?? product.name?.fr ?? '';
     const price     = effectivePrice(product);
-    const regular   = product.price.regular;
-    const onSale    = product.price.sale !== null;
-    const pct       = discountPercent(product);
+    const oldPrice  = compareAtPrice(product);
     const isOOS     = product.stock.status === 'out_of_stock';
     const isWished  = this._wishlist.has(product.id);
     const emoji     = product.images?.emoji ?? '🧴';
@@ -224,19 +222,18 @@ class ShopSection {
           ${isOOS ? `<div class="product-card__oos-overlay" data-i18n="product.outOfStock">${i18n.t('product.outOfStock')}</div>` : ''}
         </div>
 
-        <!-- Body: Strictly Brand, Title, Price, and CTA Button -->
+        <!-- Body: Strictly Brand, Title, Price (Old + Active), and CTA Button -->
         <div class="product-card__body">
           <div class="product-card__brand">${product.brand}</div>
           <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-card__name" style="text-decoration:none;color:inherit;display:block;">${title}</a>
 
           <div class="product-card__price-row">
-            <span class="product-card__price ${onSale ? 'product-card__price--sale' : ''}">
+            <span class="product-card__price current-price">
               ${formatPrice(price, lang)}
             </span>
-            ${onSale ? `
-              <span class="product-card__price-original">${formatPrice(regular, lang)}</span>
-              <span class="product-card__discount-pct">-${pct}%</span>
-            ` : ''}
+            <span class="product-card__price-original old-price">
+              ${formatPrice(oldPrice, lang)}
+            </span>
           </div>
 
           <button

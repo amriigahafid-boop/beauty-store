@@ -4,9 +4,10 @@
 
 :root {
   /* --- Brand palette --- */
-  --color-primary:        #c8607a;   /* Rose poudré */
+  --primary-color:        #9D3B5C;   /* Primary Luxury Plum / Burgundy */
+  --color-primary:        #9D3B5C;   /* Primary Luxury Plum / Burgundy */
   --color-primary-light:  #e8a0b0;
-  --color-primary-dark:   #9e3d55;
+  --color-primary-dark:   #7C2B47;
   --color-secondary:      #7c5cbf;   /* Mauve profond */
   --color-secondary-light:#b09de0;
   --color-accent:         #f5c842;   /* Or chaud */

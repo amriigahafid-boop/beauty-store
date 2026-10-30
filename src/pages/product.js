@@ -13,7 +13,7 @@ import products           from '../data/products.data.js';
 import Header             from '../components/layout/Header.js';
 import CartDrawer, { showToast } from '../components/cart/CartDrawer.js';
 import { formatPrice }    from '../utils/currency.js';
-import { effectivePrice } from '../services/productService.js';
+import { effectivePrice, compareAtPrice } from '../services/productService.js';
 
 const DEFAULT_EXAMPLE_ID = 'the-ceel-rosemary-hair-mask';
 
@@ -73,9 +73,11 @@ function renderProductPage() {
   const name     = product.title?.[lang] ?? product.name?.[lang] ?? product.title?.fr ?? product.name?.fr ?? '';
   const tagline  = product.snippet?.[lang] ?? product.tagline?.[lang] ?? product.snippet?.fr ?? product.tagline?.fr ?? '';
   const desc     = product.description?.[lang] ?? product.description?.fr ?? '';
-  const price    = effectivePrice(product);
-  const priceStr = formatPrice(price, lang);
-  const totalStr = formatPrice(price * currentQty, lang);
+  const price       = effectivePrice(product);
+  const oldPrice    = compareAtPrice(product);
+  const priceStr    = formatPrice(price, lang);
+  const oldPriceStr = formatPrice(oldPrice, lang);
+  const totalStr    = formatPrice(price * currentQty, lang);
   const rating   = product.rating?.average?.toFixed(1) ?? '4.9';
   const reviews  = product.rating?.count ?? 185;
 
@@ -167,7 +169,10 @@ function renderProductPage() {
           <!-- Rating & Price Row -->
           <div class="pdp-info__price-bar">
             <div class="pdp-info__price-block">
-              <span class="pdp-info__price">${priceStr}</span>
+              <div class="pdp-info__price-row">
+                <span class="pdp-info__price current-price">${priceStr}</span>
+                <span class="pdp-info__price-old old-price">${oldPriceStr}</span>
+              </div>
               <span class="pdp-info__tax-note">${isAr ? 'شامل الضرائب • استيراد تركيا' : 'TTC • Importé directement de Turquie'}</span>
             </div>
 
@@ -308,9 +313,10 @@ function renderProductPage() {
 
         <div class="pdp-related__grid">
           ${related.map(item => {
-            const rName  = item.title?.[lang] ?? item.name?.[lang] ?? item.title?.fr ?? item.name?.fr ?? '';
-            const rPrice = formatPrice(effectivePrice(item), lang);
-            const rUrl   = `product.html?id=${encodeURIComponent(item.id)}`;
+            const rName     = item.title?.[lang] ?? item.name?.[lang] ?? item.title?.fr ?? item.name?.fr ?? '';
+            const rPrice    = formatPrice(effectivePrice(item), lang);
+            const rOldPrice = formatPrice(compareAtPrice(item), lang);
+            const rUrl      = `product.html?id=${encodeURIComponent(item.id)}`;
             return `
               <article class="pdp-rel-card" data-url="${rUrl}">
                 <a href="${rUrl}" class="pdp-rel-card__media">
@@ -326,7 +332,10 @@ function renderProductPage() {
                   <span class="pdp-rel-card__brand">${item.brand}</span>
                   <a href="${rUrl}" class="pdp-rel-card__title">${rName}</a>
                   <div class="pdp-rel-card__bottom">
-                    <span class="pdp-rel-card__price">${rPrice}</span>
+                    <div class="pdp-rel-card__price-wrap">
+                      <span class="pdp-rel-card__price current-price">${rPrice}</span>
+                      <span class="pdp-rel-card__price-old old-price">${rOldPrice}</span>
+                    </div>
                     <a href="${rUrl}" class="pdp-rel-card__link">${isAr ? 'عرض المنتج ←' : 'Voir →'}</a>
                   </div>
                 </div>

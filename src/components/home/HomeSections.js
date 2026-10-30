@@ -316,8 +316,8 @@ export default class HomeSections {
             <div class="hs-bundle-card__footer">
               <div class="hs-bundle-card__pricing">
                 <div class="hs-bundle-card__price-row">
-                  <span class="hs-bundle-card__price-now">${formatPrice(bundlePrice, lang)}</span>
-                  <span class="hs-bundle-card__price-old">${formatPrice(regularTotal, lang)}</span>
+                  <span class="hs-bundle-card__price-now current-price">${formatPrice(bundlePrice, lang)}</span>
+                  <span class="hs-bundle-card__price-old old-price">${formatPrice(regularTotal, lang)}</span>
                 </div>
                 <span class="hs-bundle-card__save">
                   ${bundle.saveBadge?.[lang] ?? i18n.t('homeSections.bundles.saveLabel', { amount: formatPrice(savedAmount, lang) })}

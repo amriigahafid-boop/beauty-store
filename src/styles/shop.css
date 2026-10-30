@@ -354,32 +354,35 @@ img.product-card__image {
   display: none !important;
 }
 
-/* Price row */
+/* Price row — High-Converting Pricing UI */
 .product-card__price-row {
   display: flex;
   align-items: baseline;
-  gap: var(--sp-2);
+  gap: 8px;
   flex-wrap: wrap;
   margin-top: auto;
   padding-top: 2px;
 }
 
-.product-card__price {
+.product-card__price,
+.current-price {
   font-size: var(--fs-lg);
-  font-weight: var(--fw-bold);
-  color: var(--color-text);
-  line-height: 1;
+  font-weight: 600 !important;
+  color: var(--primary-color, #9D3B5C) !important;
+  line-height: 1.1;
 }
 
 .product-card__price--sale {
-  color: var(--color-primary-dark);
+  color: var(--primary-color, #9D3B5C) !important;
 }
 
-.product-card__price-original {
-  font-size: var(--fs-sm);
-  color: var(--color-text-muted);
-  text-decoration: line-through;
-  font-weight: var(--fw-regular);
+.product-card__price-original,
+.old-price {
+  font-size: 0.85em !important;
+  color: #888888 !important;
+  text-decoration: line-through !important;
+  font-weight: 400 !important;
+  line-height: 1.1;
 }
 
 .product-card__discount-pct {

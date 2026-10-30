@@ -14,7 +14,18 @@ import i18n from '../../context/i18n.js';
 
 // ── SVG Icons (inline — no external dependency needed) ─────────────────────
 const Icons = {
-  logo: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/></svg>`,
+  logoWordmark: `<svg class="header-logo-svg" viewBox="0 0 156 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lumière" direction="ltr">
+    <text
+      x="50%"
+      y="28"
+      text-anchor="middle"
+      fill="currentColor"
+      font-family="Playfair Display, Didot, Georgia, serif"
+      font-size="28"
+      font-weight="600"
+      letter-spacing="0.05em"
+    >Lumière</text>
+  </svg>`,
 
   search: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -109,7 +120,6 @@ class Header {
 
     const announcementText = i18n.t('announcement');
     const brandName        = i18n.t('footer.brand');
-    const homeHref         = this._resolveHref('#');
 
     return `
       <header class="header" id="site-header" role="banner">
@@ -158,10 +168,9 @@ class Header {
           <div class="container">
             <div class="header__inner">
 
-              <!-- ── Brand ──────────────────────────────────────── -->
-              <a href="${homeHref}" class="header__logo" aria-label="${brandName} – ${i18n.t('nav.home')}">
-                <div class="header__logo-icon" aria-hidden="true">${Icons.logo}</div>
-                <span class="header__logo-text" data-i18n="footer.brand">${brandName}</span>
+              <!-- ── Brand Wordmark (Inline SVG) ────────────────── -->
+              <a href="/" class="header-logo-link header__logo" aria-label="${brandName} – ${i18n.t('nav.home')}">
+                ${Icons.logoWordmark}
               </a>
 
               <!-- ── Navigation ─────────────────────────────────── -->

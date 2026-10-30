@@ -21,21 +21,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets (order matters) -->
-  <link rel="stylesheet" href="src/styles/variables.css?v=31" />
-  <link rel="stylesheet" href="src/styles/global.css?v=31" />
-  <link rel="stylesheet" href="src/styles/components.css?v=31" />
-  <link rel="stylesheet" href="src/styles/header.css?v=31" />
-  <link rel="stylesheet" href="src/styles/hero.css?v=31" />
-  <link rel="stylesheet" href="src/styles/shop.css?v=31" />
-  <link rel="stylesheet" href="src/styles/home-sections.css?v=31" />
-  <link rel="stylesheet" href="src/styles/cart.css?v=31" />
+  <link rel="stylesheet" href="src/styles/variables.css?v=32" />
+  <link rel="stylesheet" href="src/styles/global.css?v=32" />
+  <link rel="stylesheet" href="src/styles/components.css?v=32" />
+  <link rel="stylesheet" href="src/styles/header.css?v=32" />
+  <link rel="stylesheet" href="src/styles/hero.css?v=32" />
+  <link rel="stylesheet" href="src/styles/shop.css?v=32" />
+  <link rel="stylesheet" href="src/styles/home-sections.css?v=32" />
+  <link rel="stylesheet" href="src/styles/cart.css?v=32" />
 </head>
 
 <body>
   <!-- ╔══════════════════════════════════════════════╗ -->
-  <!-- ║  HEADER (injected by JS)                     ║ -->
+  <!-- ║  HEADER (Inline SVG Wordmark + Hydrated Nav) ║ -->
   <!-- ╚══════════════════════════════════════════════╝ -->
-  <div id="header-root"></div>
+  <div id="header-root">
+    <header class="header" role="banner">
+      <div class="header__main">
+        <div class="container">
+          <div class="header__inner">
+            <a href="/" class="header-logo-link header__logo" aria-label="Lumière">
+              <svg class="header-logo-svg" viewBox="0 0 156 38" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lumière" direction="ltr">
+                <text x="50%" y="28" text-anchor="middle" fill="currentColor" font-family="Playfair Display, Didot, Georgia, serif" font-size="28" font-weight="600" letter-spacing="0.05em">Lumière</text>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+  </div>
 
   <main id="main-content">
 
@@ -93,6 +107,6 @@
   </footer>
 
   <!-- App entry point -->
-  <script type="module" src="src/main.js?v=31"></script>
+  <script type="module" src="src/main.js?v=32"></script>
 </body>
 </html>

@@ -280,9 +280,30 @@ img.product-card__image {
   }
 }
 
-.product-card__wishlist.active {
+.product-card__wishlist svg,
+.wishlist-heart-svg {
+  fill: transparent;
+  stroke: currentColor;
+  transition:
+    fill var(--transition-fast),
+    stroke var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.product-card__wishlist.active,
+.product-card__wishlist.is-liked {
   background: #ffeef2;
   border-color: var(--color-primary-light);
+  color: var(--primary-color, #9D3B5C);
+}
+
+.product-card__wishlist svg.is-liked,
+.product-card__wishlist.is-liked svg,
+.product-card__wishlist.active svg,
+svg.is-liked {
+  fill: var(--primary-color, #9D3B5C) !important;
+  stroke: var(--primary-color, #9D3B5C) !important;
+  color: var(--primary-color, #9D3B5C) !important;
 }
 
 /* Out of stock overlay */

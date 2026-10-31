@@ -10,7 +10,11 @@
  *  - Language toggle button (FR ↔ AR + immediate RTL/LTR switch)
  */
 
-import i18n from '../../context/i18n.js';
+import i18n           from '../../context/i18n.js';
+import wishlistStore  from '../../context/wishlistStore.js';
+import products       from '../../data/products.data.js';
+import { formatPrice } from '../../utils/currency.js';
+import { effectivePrice, compareAtPrice } from '../../services/productService.js';
 
 // ── SVG Icons (inline — no external dependency needed) ─────────────────────
 const Icons = {
@@ -69,7 +73,7 @@ class Header {
   /**
    * @param {{ cartCount?: number, wishlistCount?: number }} [options]
    */
-  constructor({ cartCount = 0, wishlistCount = 0 } = {}) {
+  constructor({ cartCount = 0, wishlistCount = wishlistStore.count() } = {}) {
     this.cartCount     = cartCount;
     this.wishlistCount = wishlistCount;
     this._el           = null;
@@ -79,6 +83,15 @@ class Header {
     this._onScroll     = () => {
       if (this._el) {
         this._el.classList.toggle('header--scrolled', window.scrollY > 10);
+      }
+    };
+    this._onWishlistChange = ({ detail }) => {
+      this.wishlistCount = detail?.count ?? wishlistStore.count();
+      this._syncWishlistBadge();
+    };
+    this._onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        this.closeSearch();
       }
     };
   }
@@ -92,9 +105,143 @@ class Header {
     return hashHref === '#' ? 'index.html' : `index.html${hashHref}`;
   }
 
+  _syncWishlistBadge() {
+    if (!this._el) return;
+    const btn = this._el.querySelector('#btn-wishlist');
+    if (!btn) return;
+
+    let badge = btn.querySelector('#wishlist-badge, .header__badge');
+    const count = this.wishlistCount;
+
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.id = 'wishlist-badge';
+        badge.className = 'header__badge';
+        btn.appendChild(badge);
+      }
+      badge.textContent = String(count);
+      badge.style.display = 'flex';
+      badge.setAttribute('aria-label', i18n.t('actions.itemsCount', { count }));
+    } else if (badge) {
+      badge.textContent = '0';
+      badge.style.display = 'none';
+    }
+  }
+
+  // ── Search Overlay Methods ───────────────────────────────────────────────
+  openSearch() {
+    const overlay = this._el?.querySelector('#search-overlay') || document.getElementById('search-overlay');
+    const input   = this._el?.querySelector('#search-overlay-input') || document.getElementById('search-overlay-input');
+    if (!overlay) return;
+
+    document.body.classList.add('search-active');
+    overlay.classList.add('search-active');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    this._renderSearchResults(input?.value ?? '');
+
+    if (input) {
+      input.focus();
+      setTimeout(() => input.focus(), 40);
+    }
+  }
+
+  closeSearch() {
+    const overlay = this._el?.querySelector('#search-overlay') || document.getElementById('search-overlay');
+    document.body.classList.remove('search-active');
+    if (overlay) {
+      overlay.classList.remove('search-active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  toggleSearch() {
+    const overlay = this._el?.querySelector('#search-overlay') || document.getElementById('search-overlay');
+    const isActive = overlay?.classList.contains('search-active') || document.body.classList.contains('search-active');
+    if (isActive) {
+      this.closeSearch();
+    } else {
+      this.openSearch();
+    }
+  }
+
+  _renderSearchResults(rawQuery = '') {
+    const resultsEl = this._el?.querySelector('#search-overlay-results') || document.getElementById('search-overlay-results');
+    if (!resultsEl) return;
+
+    const lang  = i18n.lang;
+    const isAr  = lang === 'ar';
+    const query = String(rawQuery).trim().toLowerCase();
+
+    const matched = query
+      ? products.filter(p => {
+          const tFr = (p.title?.fr ?? p.name?.fr ?? '').toLowerCase();
+          const tAr = (p.title?.ar ?? p.name?.ar ?? '').toLowerCase();
+          const sFr = (p.snippet?.fr ?? p.tagline?.fr ?? '').toLowerCase();
+          const sAr = (p.snippet?.ar ?? p.tagline?.ar ?? '').toLowerCase();
+          const br  = (p.brand ?? '').toLowerCase();
+          return (
+            tFr.includes(query) ||
+            tAr.includes(query) ||
+            sFr.includes(query) ||
+            sAr.includes(query) ||
+            br.includes(query)
+          );
+        })
+      : products.slice(0, 6);
+
+    const headingText = query
+      ? (isAr ? `النتائج (${matched.length})` : `Résultats (${matched.length})`)
+      : (isAr ? 'مستحضرات مقترحة لكِ' : 'Soins Recommandés');
+
+    if (matched.length === 0) {
+      resultsEl.innerHTML = `
+        <div class="search-overlay__empty">
+          <p>${isAr ? 'لم يتم العثور على أي مستحضر يطابق بحثكِ.' : 'Aucun soin ne correspond à votre recherche.'}</p>
+        </div>
+      `;
+      return;
+    }
+
+    resultsEl.innerHTML = `
+      <div class="search-overlay__meta">${headingText}</div>
+      <div class="search-overlay__grid">
+        ${matched.slice(0, 8).map(item => {
+          const title    = item.title?.[lang] ?? item.name?.[lang] ?? item.title?.fr ?? item.name?.fr ?? '';
+          const price    = formatPrice(effectivePrice(item), lang);
+          const oldPrice = formatPrice(compareAtPrice(item), lang);
+          const url      = `product.html?id=${encodeURIComponent(item.id)}`;
+          return `
+            <a href="${url}" class="search-result-card">
+              <div class="search-result-card__thumb">
+                <img
+                  src="${item.images?.main}"
+                  alt="${title}"
+                  loading="lazy"
+                  decoding="async"
+                  onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src=this.getAttribute('src').replace('/public/','/');}"
+                />
+              </div>
+              <div class="search-result-card__info">
+                <span class="search-result-card__brand">${item.brand}</span>
+                <strong class="search-result-card__title">${title}</strong>
+                <div class="search-result-card__prices">
+                  <span class="search-result-card__price current-price">${price}</span>
+                  <span class="search-result-card__old old-price">${oldPrice}</span>
+                </div>
+              </div>
+            </a>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
   // ── Build HTML string ────────────────────────────────────────────────────
   _buildHTML() {
     const isAr = i18n.lang === 'ar';
+    this.wishlistCount = wishlistStore.count();
 
     const navLinks = NAV_LINKS.map(link => {
       const label = i18n.t(link.key);
@@ -114,8 +261,9 @@ class Header {
       ? { flag: '🇫🇷', label: i18n.t('langSwitcher.switchToFr'), code: 'FR' }
       : { flag: '🇲🇦', label: i18n.t('langSwitcher.switchToAr'), code: 'العربية' };
 
-    const announcementText = i18n.t('announcement');
-    const brandName        = i18n.t('footer.brand');
+    const announcementText  = i18n.t('announcement');
+    const brandName         = i18n.t('footer.brand');
+    const searchPlaceholder = isAr ? 'ابحثي عن مستحضر عناية...' : 'Rechercher un soin...';
 
     return `
       <header class="header" id="site-header" role="banner">
@@ -215,9 +363,12 @@ class Header {
                   type="button"
                 >
                   ${Icons.heart}
-                  ${this.wishlistCount > 0
-                    ? `<span class="header__badge" aria-label="${i18n.t('actions.itemsCount', { count: this.wishlistCount })}">${this.wishlistCount}</span>`
-                    : ''}
+                  <span
+                    id="wishlist-badge"
+                    class="header__badge"
+                    style="display: ${this.wishlistCount > 0 ? 'flex' : 'none'};"
+                    aria-label="${i18n.t('actions.itemsCount', { count: this.wishlistCount })}"
+                  >${this.wishlistCount}</span>
                 </button>
 
                 <!-- Cart -->
@@ -251,6 +402,41 @@ class Header {
             </div>
           </div>
         </div>
+
+        <!-- ── Luxury Search Overlay Modal ───────────────────────────── -->
+        <div
+          class="search-overlay"
+          id="search-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="${searchPlaceholder}"
+          aria-hidden="true"
+        >
+          <div class="search-overlay__backdrop" id="search-overlay-backdrop"></div>
+          <div class="search-overlay__panel">
+            <div class="container">
+              <div class="search-overlay__bar">
+                <span class="search-overlay__icon" aria-hidden="true">${Icons.search}</span>
+                <input
+                  type="search"
+                  id="search-overlay-input"
+                  class="search-overlay__input"
+                  placeholder="${searchPlaceholder}"
+                  autocomplete="off"
+                  aria-label="${searchPlaceholder}"
+                />
+                <button
+                  type="button"
+                  id="search-overlay-close"
+                  class="search-overlay__close"
+                  aria-label="${isAr ? 'إغلاق' : 'Fermer'}"
+                  title="${isAr ? 'إغلاق' : 'Fermer'}"
+                >✕</button>
+              </div>
+              <div class="search-overlay__results" id="search-overlay-results"></div>
+            </div>
+          </div>
+        </div>
       </header>
     `;
   }
@@ -271,6 +457,8 @@ class Header {
     if (!this._globalBound) {
       this._globalBound = true;
       document.addEventListener('langchange', this._onLangChange);
+      document.addEventListener('wishlistchange', this._onWishlistChange);
+      document.addEventListener('keydown', this._onKeyDown);
       window.addEventListener('scroll', this._onScroll, { passive: true });
     }
 
@@ -290,6 +478,45 @@ class Header {
         i18n.toggle();
       });
     }
+
+    // Search button toggle -> open/close Search Overlay & immediately focus input
+    const searchBtn     = el.querySelector('#btn-search');
+    const searchClose   = el.querySelector('#search-overlay-close');
+    const searchBackdrop= el.querySelector('#search-overlay-backdrop');
+    const searchInput   = el.querySelector('#search-overlay-input');
+
+    searchBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.toggleSearch();
+    });
+
+    searchClose?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.closeSearch();
+    });
+
+    searchBackdrop?.addEventListener('click', () => {
+      this.closeSearch();
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      this._renderSearchResults(e.target.value);
+    });
+
+    // Header Wishlist button -> filter or scroll to shop
+    const wishlistBtn = el.querySelector('#btn-wishlist');
+    wishlistBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const shopEl = document.getElementById('shop');
+      if (shopEl) {
+        if (wishlistStore.count() > 0) {
+          document.dispatchEvent(new CustomEvent('wishlistfilter'));
+        }
+        shopEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.location.href = 'index.html#shop';
+      }
+    });
 
     // Mobile menu toggle
     const hamburger = el.querySelector('#btn-hamburger');

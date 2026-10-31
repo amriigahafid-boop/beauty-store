@@ -9,6 +9,7 @@
 
 import products                             from '../../data/products.data.js';
 import cartStore                            from '../../context/cartStore.js';
+import wishlistStore                        from '../../context/wishlistStore.js';
 import i18n                                 from '../../context/i18n.js';
 import { formatPrice }                      from '../../utils/currency.js';
 import { effectivePrice, compareAtPrice, discountPercent } from '../../services/productService.js';
@@ -30,29 +31,39 @@ const FILTERS = [
   },
 ];
 
-const HEART_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
-const HEART_FILLED_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#9D3B5C" stroke="#9D3B5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+const renderHeartSvg = (isLiked = false) =>
+  `<svg class="wishlist-heart-svg${isLiked ? ' is-liked' : ''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
 
 class ShopSection {
   constructor({ cartDrawer } = {}) {
-    this._cartDrawer   = cartDrawer;
-    this._activeFilter = 'all';
-    this._activeBrand  = null;
-    this._wishlist     = new Set(JSON.parse(localStorage.getItem('beauty-store:wishlist') ?? '[]'));
-    this._el           = null;
-    this._obs          = null;
+    this._cartDrawer     = cartDrawer;
+    this._activeFilter   = 'all';
+    this._activeBrand    = null;
+    this._wishlistFilter = false;
+    this._el             = null;
+    this._obs            = null;
 
     this._onLangChange = () => this._refresh(true);
     this._onBrandFilter = ({ detail }) => {
       if (detail?.brand) {
-        this._activeBrand  = detail.brand;
-        this._activeFilter = 'all';
+        this._activeBrand    = detail.brand;
+        this._wishlistFilter = false;
+        this._activeFilter   = 'all';
+        this._refresh(true);
+      }
+    };
+    this._onWishlistFilter = () => {
+      if (wishlistStore.count() > 0) {
+        this._wishlistFilter = !this._wishlistFilter;
+        this._activeBrand    = null;
+        this._activeFilter   = 'all';
         this._refresh(true);
       }
     };
 
     document.addEventListener('langchange', this._onLangChange);
     document.addEventListener('brandfilter', this._onBrandFilter);
+    document.addEventListener('wishlistfilter', this._onWishlistFilter);
   }
 
   // ── Mount ──────────────────────────────────────────────────────────────
@@ -110,6 +121,15 @@ class ShopSection {
               <span class="shop-brand-banner__pill">
                 <span><span data-i18n="categories.brandFilterLabel">${i18n.t('categories.brandFilterLabel')}</span> <strong>${this._activeBrand}</strong></span>
                 <button type="button" class="shop-brand-banner__clear" id="btn-clear-brand" aria-label="${i18n.t('categories.clearBrandFilter')}">✕</button>
+              </span>
+            </div>
+          ` : ''}
+
+          ${this._wishlistFilter ? `
+            <div class="shop-brand-banner">
+              <span class="shop-brand-banner__pill">
+                <span>♥ <strong>${lang === 'ar' ? 'قائمة المفضلة' : 'Mes Favoris'} (${filtered.length})</strong></span>
+                <button type="button" class="shop-brand-banner__clear" id="btn-clear-wishlist" aria-label="Clear">✕</button>
               </span>
             </div>
           ` : ''}
@@ -181,7 +201,7 @@ class ShopSection {
     const price     = effectivePrice(product);
     const oldPrice  = compareAtPrice(product);
     const isOOS     = product.stock.status === 'out_of_stock';
-    const isWished  = this._wishlist.has(product.id);
+    const isWished  = wishlistStore.has(product.id);
     const emoji     = product.images?.emoji ?? '🧴';
 
     const primaryBadge = product.badges?.includes('bestseller')
@@ -213,11 +233,12 @@ class ShopSection {
 
           <button
             type="button"
-            class="product-card__wishlist ${isWished ? 'active' : ''}"
+            class="product-card__wishlist ${isWished ? 'active is-liked' : ''}"
             data-id="${product.id}"
             aria-label="${i18n.t('product.addToWishlist')}"
+            aria-pressed="${isWished}"
             title="${i18n.t('product.addToWishlist')}"
-          >${isWished ? HEART_FILLED_SVG : HEART_SVG}</button>
+          >${renderHeartSvg(isWished)}</button>
 
           ${isOOS ? `<div class="product-card__oos-overlay" data-i18n="product.outOfStock">${i18n.t('product.outOfStock')}</div>` : ''}
         </div>
@@ -273,8 +294,9 @@ class ShopSection {
   _bindTabEvents() {
     this._el.querySelectorAll('.filter-tab').forEach(btn => {
       btn.addEventListener('click', () => {
-        this._activeFilter = btn.dataset.filter;
-        this._activeBrand  = null;
+        this._activeFilter   = btn.dataset.filter;
+        this._activeBrand    = null;
+        this._wishlistFilter = false;
         this._refresh(true);
       });
     });
@@ -282,6 +304,12 @@ class ShopSection {
     const clearBrandBtn = this._el.querySelector('#btn-clear-brand');
     clearBrandBtn?.addEventListener('click', () => {
       this._activeBrand = null;
+      this._refresh(true);
+    });
+
+    const clearWishlistBtn = this._el.querySelector('#btn-clear-wishlist');
+    clearWishlistBtn?.addEventListener('click', () => {
+      this._wishlistFilter = false;
       this._refresh(true);
     });
   }
@@ -338,22 +366,32 @@ class ShopSection {
       });
     });
 
-    // Wishlist toggle
+    // Wishlist toggle (LocalStorage 'lumiere_wishlist' + .is-liked SVG class)
     this._el.querySelectorAll('.product-card__wishlist').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
         const id = btn.dataset.id;
-        if (this._wishlist.has(id)) {
-          this._wishlist.delete(id);
-          btn.innerHTML = HEART_SVG;
-          btn.classList.remove('active');
-        } else {
-          this._wishlist.add(id);
-          btn.innerHTML = HEART_FILLED_SVG;
-          btn.classList.add('active');
-          showToast(i18n.t('product.wishlistAdded'), { type: 'info', icon: '✦' });
+        if (!id) return;
+
+        const isLiked = wishlistStore.toggle(id);
+        const svgEl   = btn.querySelector('svg');
+
+        btn.classList.toggle('active', isLiked);
+        btn.classList.toggle('is-liked', isLiked);
+        btn.setAttribute('aria-pressed', String(isLiked));
+
+        if (svgEl) {
+          svgEl.classList.toggle('is-liked', isLiked);
         }
-        localStorage.setItem('beauty-store:wishlist', JSON.stringify([...this._wishlist]));
+
+        if (isLiked) {
+          showToast(i18n.t('product.wishlistAdded'), { type: 'info', icon: '♥' });
+        } else if (this._wishlistFilter) {
+          // If viewing wishlist filter and last item was unliked, refresh view
+          if (wishlistStore.count() === 0) this._wishlistFilter = false;
+          this._refresh(true);
+        }
       });
     });
   }
@@ -380,6 +418,12 @@ class ShopSection {
 
   // ── Filtering ──────────────────────────────────────────────────────────
   _getFiltered() {
+    if (this._wishlistFilter) {
+      const likedIds = new Set(wishlistStore.getIds());
+      const likedProducts = products.filter(p => likedIds.has(p.id));
+      if (likedProducts.length > 0) return likedProducts;
+      this._wishlistFilter = false;
+    }
     if (this._activeBrand) {
       return products.filter(p => p.brand.toLowerCase() === this._activeBrand.toLowerCase());
     }
